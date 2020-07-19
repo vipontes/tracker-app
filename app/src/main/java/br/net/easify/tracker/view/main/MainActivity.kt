@@ -1,4 +1,4 @@
-package br.net.easify.tracker
+package br.net.easify.tracker.view.main
 
 import android.Manifest
 import android.content.Context
@@ -11,6 +11,7 @@ import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import br.net.easify.tracker.R
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -25,6 +26,15 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var mapView: MapView
     private lateinit var mapController: MapController
     private lateinit var locationManager: LocationManager
+
+    external fun stringFromJNI(): String
+
+    companion object {
+        // Used to load the 'native-lib' library on application startup.
+        init {
+            System.loadLibrary("native-lib")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +62,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
 //        var center: GeoPoint = GeoPoint(-20.1698, -40.2487)
 //        mapController.animateTo(center)
-//
 //        addMarker(center)
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -66,7 +75,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         ) {
             return
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.1f, this)
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this)
     }
 
     override fun onResume() {
@@ -134,20 +143,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    external fun stringFromJNI(): String
-
-    companion object {
-        // Used to load the 'native-lib' library on application startup.
-        init {
-            System.loadLibrary("native-lib")
-        }
-    }
-
     override fun onLocationChanged(location: Location?) {
 
         location!!.let {
@@ -155,19 +150,14 @@ class MainActivity : AppCompatActivity(), LocationListener {
             mapController.animateTo(center)
             addMarker(center)
         }
-
-
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        TODO("Not yet implemented")
     }
 
     override fun onProviderEnabled(provider: String?) {
-        TODO("Not yet implemented")
     }
 
     override fun onProviderDisabled(provider: String?) {
-        TODO("Not yet implemented")
     }
 }
