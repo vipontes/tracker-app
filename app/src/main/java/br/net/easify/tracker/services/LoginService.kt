@@ -1,4 +1,4 @@
-package br.net.easify.tracker.services.interceptor
+package br.net.easify.tracker.services
 
 import br.net.easify.tracker.interfaces.ILogin
 import br.net.easify.tracker.model.LoginBody
