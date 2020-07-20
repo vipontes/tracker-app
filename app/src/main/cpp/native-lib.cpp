@@ -4,7 +4,7 @@
 std::string hello = "Hello from C++";
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_br_net_easify_tracker_MainActivity_stringFromJNI(JNIEnv* env, jobject) {
+Java_br_net_easify_tracker_view_main_MainActivity_stringFromJNI(JNIEnv* env, jobject) {
 
     return env->NewStringUTF(hello.c_str());
 }

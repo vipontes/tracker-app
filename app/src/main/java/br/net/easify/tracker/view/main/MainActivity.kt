@@ -7,10 +7,11 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.preference.PreferenceManager
+
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import br.net.easify.tracker.R
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -59,7 +60,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
         mapController = mapView.controller as MapController
         mapController.setZoom(16)
 
-
 //        var center: GeoPoint = GeoPoint(-20.1698, -40.2487)
 //        mapController.animateTo(center)
 //        addMarker(center)
@@ -90,10 +90,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        if ( locationManager != null ) {
-            locationManager.removeUpdates(this)
-        }
+        locationManager.removeUpdates(this)
     }
 
     fun addMarker(center: GeoPoint) {
