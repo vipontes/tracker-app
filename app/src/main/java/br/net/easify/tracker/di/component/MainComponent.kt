@@ -1,5 +1,6 @@
 package br.net.easify.tracker.di.component
 
+import br.net.easify.tracker.di.module.ApiModule
 import br.net.easify.tracker.di.module.AppModule
 import br.net.easify.tracker.di.module.DatabaseModule
 import br.net.easify.tracker.viewmodel.LoginViewModel
@@ -10,9 +11,10 @@ import javax.inject.Singleton
 @Component(
     modules = [
         DatabaseModule::class,
-        AppModule::class
+        AppModule::class,
+        ApiModule::class
     ]
 )
-interface DatabaseComponent {
+interface MainComponent {
     fun inject(viewModel: LoginViewModel)
 }

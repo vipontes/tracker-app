@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.di.component.DaggerDatabaseComponent
+import br.net.easify.tracker.di.component.DaggerMainComponent
 import br.net.easify.tracker.di.module.AppModule
 import br.net.easify.tracker.model.ErrorResponse
 import br.net.easify.tracker.model.LoginBody
@@ -24,18 +24,19 @@ import javax.inject.Inject
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val disposable = CompositeDisposable()
-    private val loginService = LoginService()
 
     val tokens by lazy { MutableLiveData<Token>() }
     val errorResponse by lazy { MutableLiveData<ErrorResponse>() }
     val loginBody by lazy { MutableLiveData<LoginBody>() }
 
     @Inject
+    lateinit var loginService: LoginService
+
+    @Inject
     lateinit var database: AppDatabase
 
     init {
-
-        DaggerDatabaseComponent.builder()
+        DaggerMainComponent.builder()
             .appModule(AppModule(application))
             .build()
             .inject(this)
@@ -56,7 +57,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         .subscribeWith(object : DisposableSingleObserver<Token>() {
                             override fun onSuccess(res: Token) {
                                 tokens.value = res
-                                errorResponse.value = null
                             }
                             override fun onError(e: Throwable) {
                                 e.printStackTrace()
