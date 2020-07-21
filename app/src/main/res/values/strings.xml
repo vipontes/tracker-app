@@ -5,4 +5,7 @@
     <string name="login_email_hint">Email</string>
     <string name="login_password_hint">Password</string>
 
+    <string name="empty_email">Invalid E-mail</string>
+    <string name="empty_password">Invalid Password</string>
+    <string name="internal_error">Internal Error</string>
 </resources>

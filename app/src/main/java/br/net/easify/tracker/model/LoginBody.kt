@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class LoginBody (
-    val user_email: String?,
-    val user_password: String?
+    var user_email: String?,
+    var user_password: String?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
