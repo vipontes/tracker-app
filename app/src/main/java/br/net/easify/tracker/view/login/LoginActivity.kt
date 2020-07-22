@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
+import br.net.easify.tracker.database.model.TokenLocal
 import br.net.easify.tracker.databinding.ActivityLoginBinding
 import br.net.easify.tracker.model.ErrorResponse
 import br.net.easify.tracker.model.LoginBody
@@ -23,6 +24,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var dataBinding: ActivityLoginBinding
 
     private val tokensObserver = Observer<Token> {
+
+        var tokenLocal = TokenLocal(it.token, it.refreshToken)
+        viewModel.saveTokens(tokenLocal)
         startMainActivity()
     }
 

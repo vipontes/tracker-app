@@ -11,8 +11,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import br.net.easify.tracker.R
+import br.net.easify.tracker.viewmodel.LoginViewModel
+import br.net.easify.tracker.viewmodel.MainViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -22,6 +25,9 @@ import org.osmdroid.views.overlay.Marker
 
 
 class MainActivity : AppCompatActivity(), LocationListener {
+
+    private lateinit var viewModel: MainViewModel
+
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
 
     private lateinit var mapView: MapView
@@ -42,6 +48,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
         Configuration.getInstance()
             .load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
         setContentView(R.layout.activity_main)
+
+        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
         requestPermissionsIfNecessary(arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,

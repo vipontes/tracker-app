@@ -24,7 +24,6 @@ class AuthInterceptor @Inject constructor(private val tokens: TokenLocal) : Inte
 
 
 
-// https://medium.com/@emmanuelguther/android-refresh-token-with-multiple-calls-with-retrofit-babe5d1023a1
 
                     return initialResponse
                 }

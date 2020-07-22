@@ -6,12 +6,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.di.component.DaggerMainComponent
+import br.net.easify.tracker.database.model.TokenLocal
+import br.net.easify.tracker.di.component.DaggerViewModuleComponent
 import br.net.easify.tracker.di.module.AppModule
 import br.net.easify.tracker.model.ErrorResponse
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.services.LoginService
+import br.net.easify.tracker.services.UserService
+import br.net.easify.tracker.utils.SharedPreferencesHelper
 import com.google.gson.JsonParser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -26,6 +29,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val disposable = CompositeDisposable()
 
     val tokens by lazy { MutableLiveData<Token>() }
+    val loggedUser by lazy { MutableLiveData<Token>() }
     val errorResponse by lazy { MutableLiveData<ErrorResponse>() }
     val loginBody by lazy { MutableLiveData<LoginBody>() }
 
@@ -33,10 +37,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     lateinit var loginService: LoginService
 
     @Inject
+    lateinit var userService: UserService
+
+    @Inject
     lateinit var database: AppDatabase
 
+    @Inject
+    lateinit var prefs: SharedPreferencesHelper
+
     init {
-        DaggerMainComponent.builder()
+        DaggerViewModuleComponent.builder()
             .appModule(AppModule(application))
             .build()
             .inject(this)
@@ -76,6 +86,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
         }
+    }
+
+    fun saveTokens(tokens: TokenLocal) {
+
+        prefs.setToken(tokens.token)
+        prefs.setRefreshToken(tokens.refresh_token)
+
+        database.tokenDao().delete()
+        database.tokenDao().insert(tokens)
     }
 
     private fun validate(context: Context): Boolean {
