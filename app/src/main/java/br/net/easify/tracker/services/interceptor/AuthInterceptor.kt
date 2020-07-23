@@ -2,33 +2,35 @@ package br.net.easify.tracker.services.interceptor
 
 import br.net.easify.tracker.database.model.TokenLocal
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthInterceptor @Inject constructor(private val tokens: TokenLocal) : Interceptor {
+class AuthInterceptor @Inject constructor() : Interceptor {
+
+    private var tokens: TokenLocal? = null
+    fun setTokens(tokens: TokenLocal) {
+        this.tokens = tokens
+    }
+
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response? {
-
         synchronized(this) {
-            val originalRequest = chain.request()
+            val request: Request = chain.request()
 
-            val authenticationRequest = originalRequest.newBuilder()
-                .addHeader("Authorization", "Bearer ${tokens.token}")
-                .build()
+            val requestBuilder: Request.Builder = request.newBuilder()
 
-            val initialResponse = chain.proceed(authenticationRequest)
-
-            when {
-                initialResponse.code() == 403 || initialResponse.code() == 401 -> {
-
-
-
-
-                    return initialResponse
+            if (request.header("No-Authentication") == null) {
+                if (tokens == null) {
+                    throw java.lang.RuntimeException("Token not found")
+                } else {
+                    requestBuilder.addHeader("Authorization", "Bearer ${tokens?.token}")
                 }
-                else -> return initialResponse
             }
+
+            return chain.proceed(requestBuilder.build())
         }
     }
 }

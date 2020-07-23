@@ -5,3 +5,4 @@ class Constants {
         val apiUrl = "http://tracker2.easify.info"
     }
 }
+

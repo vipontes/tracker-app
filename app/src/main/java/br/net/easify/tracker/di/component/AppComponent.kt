@@ -1,6 +1,5 @@
 package br.net.easify.tracker.di.component
 
-
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.di.module.AppModule
 import dagger.Component

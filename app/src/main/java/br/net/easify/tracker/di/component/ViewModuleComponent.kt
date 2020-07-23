@@ -6,16 +6,17 @@ import br.net.easify.tracker.viewmodel.MainViewModel
 import dagger.Component
 import javax.inject.Singleton
 
-@Singleton
 @Component(
     modules = [
         DatabaseModule::class,
         AppModule::class,
-        AuthModule::class,
+        ApiModule::class,
+        LoginModule::class,
         UserModule::class,
         PrefsModule::class
     ]
 )
+@Singleton
 interface ViewModuleComponent {
     fun inject(viewModel: LoginViewModel)
     fun inject(viewModel: MainViewModel)

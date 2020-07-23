@@ -1,6 +1,6 @@
 package br.net.easify.tracker.services
 
-import br.net.easify.tracker.di.component.DaggerUserComponent
+import br.net.easify.tracker.di.component.DaggerApiComponent
 import br.net.easify.tracker.interfaces.IUser
 import br.net.easify.tracker.model.User
 import io.reactivex.Single
@@ -12,7 +12,7 @@ class UserService {
     lateinit var api: IUser
 
     init {
-        DaggerUserComponent.create().inject(this)
+        DaggerApiComponent.create().inject(this)
     }
 
     fun getUser(userId: Int): Single<User> {

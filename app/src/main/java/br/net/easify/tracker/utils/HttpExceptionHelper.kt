@@ -15,7 +15,7 @@ class HttpExceptionHelper {
             if (e is HttpException) {
 
                 val errorJsonString = e.response().errorBody()?.string()
-                val message = JsonParser().parse(errorJsonString)
+                val message = JsonParser.parseString(errorJsonString!!)
                     .asJsonObject["message"]
                     .asString
 

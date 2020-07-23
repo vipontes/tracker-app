@@ -14,20 +14,21 @@ import br.net.easify.tracker.databinding.ActivityLoginBinding
 import br.net.easify.tracker.model.ErrorResponse
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
+import br.net.easify.tracker.model.User
 import br.net.easify.tracker.view.main.MainActivity
 import br.net.easify.tracker.viewmodel.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var viewModel: LoginViewModel
-    private var loginBody: LoginBody? = null
+    private lateinit var loginBody: LoginBody
     private lateinit var dataBinding: ActivityLoginBinding
 
     private val tokensObserver = Observer<Token> {
 
         var tokenLocal = TokenLocal(it.token, it.refreshToken)
         viewModel.saveTokens(tokenLocal)
-        startMainActivity()
+        viewModel.getUserFromToken(this)
     }
 
     private val errorMessageObserver = Observer<ErrorResponse> { error: ErrorResponse ->
@@ -43,6 +44,12 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private val userObserver = Observer<User> { data: User ->
+        data.let {
+            startMainActivity()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataBinding =
@@ -50,14 +57,17 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         viewModel.loginBody.observe(this, loginObserver)
+        viewModel.loggedUser.observe(this, userObserver)
         viewModel.tokens.observe(this, tokensObserver)
         viewModel.errorResponse.observe(this, errorMessageObserver)
 
         dataBinding.loginButton.setOnClickListener(View.OnClickListener {
-            viewModel.login(this)
+            if ( viewModel.validate(this) ) {
+                viewModel.login(this)
+            }
         })
 
-        dataBinding.loginBody = this.loginBody
+        //dataBinding.loginBody = this.loginBody
     }
 
     private fun startMainActivity() {
