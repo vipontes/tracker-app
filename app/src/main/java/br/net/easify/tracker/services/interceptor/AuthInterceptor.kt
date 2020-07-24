@@ -8,9 +8,8 @@ import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class AuthInterceptor @Inject constructor() : Interceptor {
+class AuthInterceptor @Inject constructor(private var tokens: TokenLocal) : Interceptor {
 
-    private var tokens: TokenLocal? = null
     fun setTokens(tokens: TokenLocal) {
         this.tokens = tokens
     }

@@ -11,7 +11,7 @@ class PrefsModule {
 
     @Provides
     @Singleton
-    fun providesSharedPreferences(application: Application): SharedPreferencesHelper {
+    fun provideSharedPreferences(application: Application): SharedPreferencesHelper {
         return SharedPreferencesHelper(application)
     }
 }
