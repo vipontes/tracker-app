@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import br.net.easify.tracker.R
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -22,7 +23,7 @@ class HomeFragment : Fragment(), LocationListener {
     private lateinit var mapView: MapView
     private lateinit var mapController: MapController
     private lateinit var locationManager: LocationManager
-
+    private lateinit var currentLocation: Location
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(
@@ -32,19 +33,14 @@ class HomeFragment : Fragment(), LocationListener {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-
         mapView = view.findViewById(R.id.mapView)
         mapView.setUseDataConnection(true)
         mapView.setTileSource(TileSourceFactory.MAPNIK)
-
+        mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mapView.setMultiTouchControls(true)
 
         mapController = mapView.controller as MapController
         mapController.setZoom(16)
-
-//        var center: GeoPoint = GeoPoint(-20.1698, -40.2487)
-//        mapController.animateTo(center)
-//        addMarker(center)
 
         locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this)
@@ -79,9 +75,13 @@ class HomeFragment : Fragment(), LocationListener {
 
     override fun onLocationChanged(location: Location?) {
         location!!.let {
-            var center: GeoPoint = GeoPoint(it.latitude, it.longitude)
-            mapController.animateTo(center)
-            addMarker(center)
+            if (!this::currentLocation.isInitialized) {
+                var center: GeoPoint = GeoPoint(it.latitude, it.longitude)
+                mapController.animateTo(center)
+                addMarker(center)
+            }
+            currentLocation = it
+
         }
     }
 

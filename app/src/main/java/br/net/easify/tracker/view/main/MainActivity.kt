@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
 
-        botomAppBar.setOnMenuItemClickListener { item ->
+        botomAppBar.setOnNavigationItemSelectedListener { item ->
             when(item.itemId) {
                 R.id.menuHome -> {
                     homeFragment = HomeFragment()
