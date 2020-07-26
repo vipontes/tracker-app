@@ -11,7 +11,7 @@ data class UserLocal(
     var user_name: String,
     var user_email: String,
     var user_password: String,
-    var user_avatar: String,
+    var user_avatar: String?,
     var user_active: Int,
     var user_created_at: String,
     var token: String,

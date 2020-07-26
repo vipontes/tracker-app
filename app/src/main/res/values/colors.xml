@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#FC8822</color>
+    <color name="colorPrimary">#745a40</color>
+    <color name="colorPrimaryDark">#473419</color>
+    <color name="colorAccent">#a53e24</color>
 
+    <color name="colorScheme1">#745a40</color>
+    <color name="colorScheme2">#b79760</color>
+    <color name="colorScheme3">#473419</color>
+    <color name="colorScheme4">#a53e24</color>
+    <color name="colorScheme5">#a35f3e</color>
 
-    <!--colors for modern ui-->
-    <color name="whiteTextColor">#fff</color>
-    <color name="primaryTextColor">#2661FA</color>
+    <!-- Login ui -->
+    <color name="whiteTextColor">#f5f3ec</color>
+    <color name="primaryTextColor">#473419</color>
     <color name="loginBkColor">#f0f0f0</color>
 
-    <!--colros for card-->
-    <color name="whiteCardColor">#fff</color>
+    <color name="colorWhite">#ffffff</color>
 </resources>

@@ -22,7 +22,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".view.main.MainActivity"></activity>
+        <activity android:name=".view.main.MainActivity"
+            android:theme="@style/AppThemeNoActionBar">
+        </activity>
         <activity android:name=".view.login.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="screenLayout|orientation|screenSize"

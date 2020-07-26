@@ -9,6 +9,9 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE user_id = :userId")
     fun getUser(userId: Int?): UserLocal?
 
+    @Query("SELECT * FROM user LIMIT 1")
+    fun getLoggedUser(): UserLocal?
+
     @Query("SELECT * FROM user ORDER BY user_id")
     fun getAll(): List<UserLocal>?
 
@@ -17,6 +20,9 @@ interface UserDao {
 
     @Query("DELETE FROM user WHERE user_id = :userId")
     fun delete(userId: Int?)
+
+    @Query("DELETE FROM user")
+    fun delete()
 
     @Update
     fun update(user: UserLocal?)

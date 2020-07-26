@@ -8,6 +8,7 @@ import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
 import br.net.easify.tracker.database.model.TokenLocal
+import br.net.easify.tracker.database.model.UserLocal
 import br.net.easify.tracker.model.ErrorResponse
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
@@ -82,6 +83,28 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun saveTokens(tokens: TokenLocal) {
         database.tokenDao().delete()
         database.tokenDao().insert(tokens)
+    }
+
+    fun saveLoggedUser(user: User) {
+
+        val localUser = UserLocal(
+            user.userId,
+            user.userName,
+            user.userEmail,
+            "",
+            user.userAvatar,
+            user.userActive,
+            user.userCreatedAt,
+            user.token,
+            user.refreshToken
+        )
+
+        database.userDao().delete()
+        database.userDao().insert(localUser)
+    }
+
+    fun getLoggedUser(): UserLocal? {
+        return database.userDao().getLoggedUser()
     }
 
     fun getUserFromToken(context: Context) {
