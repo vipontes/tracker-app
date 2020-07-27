@@ -2,14 +2,16 @@ package br.net.easify.tracker.view.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import br.net.easify.tracker.R
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -17,6 +19,9 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
 
 class HomeFragment : Fragment(), LocationListener {
 
@@ -24,6 +29,8 @@ class HomeFragment : Fragment(), LocationListener {
     private lateinit var mapController: MapController
     private lateinit var locationManager: LocationManager
     private lateinit var currentLocation: Location
+    private lateinit var myLocationOverlay: MyLocationNewOverlay
+
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(
@@ -38,6 +45,22 @@ class HomeFragment : Fragment(), LocationListener {
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mapView.setMultiTouchControls(true)
+
+        val gpsMyLocationProvider = GpsMyLocationProvider(context)
+        gpsMyLocationProvider.locationUpdateMinDistance = 10f
+        gpsMyLocationProvider.locationUpdateMinTime = 5000
+
+        myLocationOverlay = MyLocationNewOverlay(gpsMyLocationProvider, mapView)
+        myLocationOverlay.enableMyLocation();
+
+
+//        val posIcon: Bitmap =
+//            BitmapFactory.decodeResource(requireContext().resources, R.drawable.ic_about)
+//        myLocationOverlay.setPersonIcon(posIcon)
+
+        mapView.overlays.add(myLocationOverlay);
+
+
 
         mapController = mapView.controller as MapController
         mapController.setZoom(16)
