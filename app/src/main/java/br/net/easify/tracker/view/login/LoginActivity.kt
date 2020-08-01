@@ -62,6 +62,9 @@ class LoginActivity : AppCompatActivity() {
 
         Dexter.withActivity(this@LoginActivity)
             .withPermissions(
+                Manifest.permission.CAMERA,
+                Manifest.permission.VIBRATE,
+                Manifest.permission.SYSTEM_ALERT_WINDOW,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_NETWORK_STATE,

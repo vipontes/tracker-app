@@ -1,16 +1,11 @@
 package br.net.easify.tracker.view.main
 
-import android.app.ActivityManager
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import br.net.easify.tracker.R
-import br.net.easify.tracker.background.services.LocationService
-import br.net.easify.tracker.utils.ServiceHelper
 import br.net.easify.tracker.view.fragments.GalleryFragment
 import br.net.easify.tracker.view.fragments.HistoryFragment
 import br.net.easify.tracker.view.fragments.HomeFragment
@@ -24,10 +19,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
 
-    private lateinit var homeFragment: HomeFragment
-    private lateinit var galleryFragment: GalleryFragment
-    private lateinit var historyFragment: HistoryFragment
-    private lateinit var settingsFragment: SettingsFragment
+    private var homeFragment: HomeFragment = HomeFragment()
+    private var galleryFragment: GalleryFragment = GalleryFragment()
+    private var historyFragment: HistoryFragment = HistoryFragment()
+    private var settingsFragment: SettingsFragment = SettingsFragment()
 
     external fun stringFromJNI(): String
 
@@ -39,18 +34,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Configuration.getInstance()
-            .load(
-                applicationContext,
-                PreferenceManager.getDefaultSharedPreferences(applicationContext)
-            )
+        Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
         setContentView(R.layout.activity_main)
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-
         viewModel.startLocationService()
 
-        homeFragment = HomeFragment()
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.frame_layout, homeFragment)
@@ -60,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         botomAppBar.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.menuHome -> {
-                    homeFragment = HomeFragment()
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.frame_layout, homeFragment)
@@ -68,7 +56,6 @@ class MainActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.menuHistory -> {
-                    historyFragment = HistoryFragment()
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.frame_layout, historyFragment)
@@ -76,7 +63,6 @@ class MainActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.menuGallery -> {
-                    galleryFragment = GalleryFragment()
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.frame_layout, galleryFragment)
@@ -84,7 +70,6 @@ class MainActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.menuSettings -> {
-                    settingsFragment = SettingsFragment()
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.frame_layout, settingsFragment)
@@ -95,9 +80,5 @@ class MainActivity : AppCompatActivity() {
 
             true
         }
-
-
     }
-
-
 }

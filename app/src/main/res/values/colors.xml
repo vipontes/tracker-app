@@ -10,10 +10,9 @@
     <color name="colorScheme4">#a53e24</color>
     <color name="colorScheme5">#a35f3e</color>
 
-    <!-- Login ui -->
-    <color name="whiteTextColor">#f5f3ec</color>
-    <color name="primaryTextColor">#473419</color>
+    <color name="colorWhite">#f5f3ec</color>
+    <color name="colorRed">#e8505b</color>
+
     <color name="loginBkColor">#f0f0f0</color>
 
-    <color name="colorWhite">#ffffff</color>
 </resources>
