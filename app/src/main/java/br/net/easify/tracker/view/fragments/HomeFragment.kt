@@ -11,11 +11,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.R
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.utils.Constants
 import br.net.easify.tracker.utils.ServiceHelper
+import br.net.easify.tracker.viewmodel.HomeViewModel
+import br.net.easify.tracker.viewmodel.MainViewModel
+import kotlinx.android.synthetic.main.fragment_home.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -25,8 +29,9 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
-
 class HomeFragment : Fragment() {
+
+    private lateinit var viewModel: HomeViewModel
 
     private lateinit var mapView: MapView
     private lateinit var mapController: MapController
@@ -46,11 +51,9 @@ class HomeFragment : Fragment() {
                 addMarker(currentLocation)
                 mapController.animateTo(currentLocation)
 
-                val gpsService = LocationService()
-                val gpsIntent = Intent(requireContext(), gpsService::class.java)
-                if (ServiceHelper(requireContext().applicationContext).isMyServiceRunning(gpsService::class.java)) {
-                    requireContext().stopService(gpsIntent)
-                }
+                viewModel.stopLocationService()
+
+                spinner.visibility = View.GONE
             }
         }
     }
@@ -62,6 +65,8 @@ class HomeFragment : Fragment() {
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
 
         mapView = view.findViewById(R.id.mapView)
         mapView.setUseDataConnection(true)
@@ -95,11 +100,9 @@ class HomeFragment : Fragment() {
         val intentFilter = IntentFilter(LocationService.locationChangeAction)
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(onLocationServiceNotification, intentFilter)
 
-        val gpsService = LocationService()
-        val gpsIntent = Intent(requireContext(), gpsService::class.java)
-        if (!ServiceHelper(requireContext().applicationContext).isMyServiceRunning(gpsService::class.java)) {
-            requireContext().startService(gpsIntent)
-        }
+        viewModel.startLocationService()
+
+        spinner.visibility = View.VISIBLE
     }
 
     override fun onPause() {

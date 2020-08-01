@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
+        viewModel.startLocationService()
+
         homeFragment = HomeFragment()
         supportFragmentManager
             .beginTransaction()
@@ -94,11 +96,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        val gpsService = LocationService()
-        val gpsIntent = Intent(applicationContext, gpsService::class.java)
-        if (!ServiceHelper(applicationContext).isMyServiceRunning(gpsService::class.java)) {
-            startService(gpsIntent)
-        }
+
     }
 
 

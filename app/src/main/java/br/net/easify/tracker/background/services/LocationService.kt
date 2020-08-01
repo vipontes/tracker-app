@@ -10,7 +10,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.R
@@ -74,13 +73,8 @@ class LocationService : Service(), LocationListener {
             intent.putExtra(Constants.latitude, lastLocation.latitude)
             intent.putExtra(Constants.longitude, lastLocation.longitude)
 
-
-            // Se a activity de roteiros estiver ativa, atualiza a tela
             val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
-
             broadcastManager.sendBroadcast(intent)
-
-            Log.d("Location", lastLocation.toString())
         }
     }
 
