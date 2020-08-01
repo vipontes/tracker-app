@@ -1,5 +1,6 @@
 package br.net.easify.tracker.background.services
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.R
 import br.net.easify.tracker.utils.Constants
 import br.net.easify.tracker.view.main.MainActivity
@@ -21,6 +23,10 @@ class LocationService : Service(), LocationListener {
     private val defaultLocationDistance = 5f // Metros
     private lateinit var locationManager: LocationManager
     private lateinit var lastLocation: Location
+
+    companion object {
+        val locationChangeAction = "br.net.easify.tracker.background.receivers.LocationBroadcastReceiver"
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -60,6 +66,20 @@ class LocationService : Service(), LocationListener {
     override fun onLocationChanged(location: Location?) {
         location?.let {
             lastLocation = Location(it)
+
+            val intent = Intent(locationChangeAction)
+            intent.putExtra(Constants.resultCode, Activity.RESULT_OK)
+            intent.putExtra(Constants.provider, lastLocation.provider)
+            intent.putExtra(Constants.altitude, lastLocation.altitude)
+            intent.putExtra(Constants.latitude, lastLocation.latitude)
+            intent.putExtra(Constants.longitude, lastLocation.longitude)
+
+
+            // Se a activity de roteiros estiver ativa, atualiza a tela
+            val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+
+            broadcastManager.sendBroadcast(intent)
+
             Log.d("Location", lastLocation.toString())
         }
     }

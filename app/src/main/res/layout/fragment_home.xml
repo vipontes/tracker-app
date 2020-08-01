@@ -41,7 +41,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:text="0,00"/>
 
@@ -50,8 +50,14 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:textSize="14sp"
+                        android:text="Distance"/>
 
-                        android:text="Distance (km)"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textSize="11sp"
+                        android:text="(km)"/>
 
                 </LinearLayout>
 
@@ -65,7 +71,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:text="0"/>
 
@@ -74,8 +80,14 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:textSize="14sp"
+                        android:text="Calories"/>
 
-                        android:text="Calories (kcal)"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textSize="11sp"
+                        android:text="(kcal)"/>
 
                 </LinearLayout>
 
@@ -89,7 +101,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:text="00:00"/>
 
@@ -98,8 +110,14 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:textSize="14sp"
+                        android:text="Rhythm"/>
 
-                        android:text="Rhythm (min/km)"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textSize="11sp"
+                        android:text="(min/km)"/>
 
                 </LinearLayout>
 

@@ -29,11 +29,15 @@
         android:theme="@style/AppTheme"
         tools:targetApi="q">
         <activity android:name=".view.main.MainActivity"
-            android:theme="@style/AppThemeNoActionBar">
+            android:theme="@style/AppThemeNoActionBar"
+            android:configChanges="screenLayout|orientation|screenSize"
+            android:screenOrientation="sensorPortrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
         <activity android:name=".view.login.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="screenLayout|orientation|screenSize"
+            android:screenOrientation="sensorPortrait"
             android:windowSoftInputMode="stateHidden|adjustPan" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,10 +55,11 @@
             android:exported="true"
             android:label="LocationServiceBootReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-<!--                <action android:name="LocationService.RestartSensor" />-->
+<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
+                <action android:name="LocationService.RestartSensor" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>
