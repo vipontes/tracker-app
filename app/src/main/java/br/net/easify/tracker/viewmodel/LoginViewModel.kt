@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.database.model.TokenLocal
-import br.net.easify.tracker.database.model.UserLocal
+import br.net.easify.tracker.database.model.DbToken
+import br.net.easify.tracker.database.model.DbUser
 import br.net.easify.tracker.model.ErrorResponse
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
@@ -80,14 +80,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    fun saveTokens(tokens: TokenLocal) {
+    fun saveTokens(tokens: DbToken) {
         database.tokenDao().delete()
         database.tokenDao().insert(tokens)
     }
 
     fun saveLoggedUser(user: User) {
 
-        val localUser = UserLocal(
+        val dbUser = DbUser(
             user.userId,
             user.userName,
             user.userEmail,
@@ -100,21 +100,21 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         )
 
         database.userDao().delete()
-        database.userDao().insert(localUser)
+        database.userDao().insert(dbUser)
     }
 
-    fun getLoggedUser(): UserLocal? {
+    fun getLoggedUser(): DbUser? {
         return database.userDao().getLoggedUser()
     }
 
     fun getUserFromToken(context: Context) {
 
-        val tokenLocal = database.tokenDao().get()
-        tokenLocal?.let {tokens: TokenLocal ->
+        val dbToken = database.tokenDao().get()
+        dbToken?.let { tokens: DbToken ->
             val jwt = JWT(tokens.token)
             val userId = jwt.getClaim("userId").asInt()
 
-            userService.setTokens(tokenLocal)
+            userService.setTokens(dbToken)
 
             userId?.let { id: Int ->
                 disposable.add(

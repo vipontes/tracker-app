@@ -1,29 +1,29 @@
 package br.net.easify.tracker.database.dao
 
 import androidx.room.*
-import br.net.easify.tracker.database.model.UserLocal
+import br.net.easify.tracker.database.model.DbUser
 
 @Dao
 interface UserDao {
 
     @Query("SELECT * FROM user WHERE user_id = :userId")
-    fun getUser(userId: Int?): UserLocal?
+    fun getUser(userId: Int?): DbUser?
 
     @Query("SELECT * FROM user LIMIT 1")
-    fun getLoggedUser(): UserLocal?
+    fun getLoggedUser(): DbUser?
 
     @Query("SELECT * FROM user ORDER BY user_id")
-    fun getAll(): List<UserLocal>?
+    fun getAll(): List<DbUser>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(user: UserLocal?)
+    fun insert(dbUser: DbUser)
 
     @Query("DELETE FROM user WHERE user_id = :userId")
-    fun delete(userId: Int?)
+    fun delete(userId: Int)
 
     @Query("DELETE FROM user")
     fun delete()
 
     @Update
-    fun update(user: UserLocal?)
+    fun update(dbUser: DbUser?)
 }

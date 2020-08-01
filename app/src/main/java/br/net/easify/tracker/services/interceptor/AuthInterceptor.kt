@@ -1,16 +1,15 @@
 package br.net.easify.tracker.services.interceptor
 
-import br.net.easify.tracker.database.model.TokenLocal
+import br.net.easify.tracker.database.model.DbToken
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
 
-class AuthInterceptor @Inject constructor(private var tokens: TokenLocal) : Interceptor {
+class AuthInterceptor @Inject constructor(private var tokens: DbToken) : Interceptor {
 
-    fun setTokens(tokens: TokenLocal) {
+    fun setTokens(tokens: DbToken) {
         this.tokens = tokens
     }
 

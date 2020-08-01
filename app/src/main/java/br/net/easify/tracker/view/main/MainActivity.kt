@@ -1,11 +1,15 @@
 package br.net.easify.tracker.view.main
 
+import android.app.ActivityManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import br.net.easify.tracker.R
+import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.view.fragments.GalleryFragment
 import br.net.easify.tracker.view.fragments.HistoryFragment
 import br.net.easify.tracker.view.fragments.HomeFragment
@@ -13,6 +17,7 @@ import br.net.easify.tracker.view.fragments.SettingsFragment
 import br.net.easify.tracker.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import org.osmdroid.config.Configuration
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +31,6 @@ class MainActivity : AppCompatActivity() {
     external fun stringFromJNI(): String
 
     companion object {
-        // Used to load the 'native-lib' library on application startup.
         init {
             System.loadLibrary("native-lib")
         }
@@ -35,7 +39,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Configuration.getInstance()
-            .load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
+            .load(
+                applicationContext,
+                PreferenceManager.getDefaultSharedPreferences(applicationContext)
+            )
         setContentView(R.layout.activity_main)
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
@@ -48,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
 
         botomAppBar.setOnNavigationItemSelectedListener { item ->
-            when(item.itemId) {
+            when (item.itemId) {
                 R.id.menuHome -> {
                     homeFragment = HomeFragment()
                     supportFragmentManager
@@ -85,5 +92,22 @@ class MainActivity : AppCompatActivity() {
 
             true
         }
+
+
+        val gpsService = LocationService()
+        val gpsIntent = Intent(applicationContext, gpsService::class.java)
+        if (!isMyServiceRunning(gpsService::class.java)) {
+            startService(gpsIntent)
+        }
+    }
+
+    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 }

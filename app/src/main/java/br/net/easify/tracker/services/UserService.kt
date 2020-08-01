@@ -1,6 +1,6 @@
 package br.net.easify.tracker.services
 
-import br.net.easify.tracker.database.model.TokenLocal
+import br.net.easify.tracker.database.model.DbToken
 import br.net.easify.tracker.interfaces.IUser
 import br.net.easify.tracker.model.User
 import br.net.easify.tracker.services.interceptor.AuthInterceptor
@@ -13,9 +13,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class UserService () {
 
-    private var interceptor: AuthInterceptor = AuthInterceptor(TokenLocal("", ""))
+    private var interceptor: AuthInterceptor = AuthInterceptor(DbToken("", ""))
 
-    fun setTokens(tokens: TokenLocal) {
+    fun setTokens(tokens: DbToken) {
         this.interceptor.setTokens(tokens)
     }
 

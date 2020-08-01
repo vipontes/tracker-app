@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "token")
-data class TokenLocal(
+data class DbToken(
     @PrimaryKey
     var token: String,
     var refresh_token: String

@@ -1,17 +1,16 @@
 package br.net.easify.tracker.database.dao
 
 import androidx.room.*
-import br.net.easify.tracker.database.model.TokenLocal
-import br.net.easify.tracker.database.model.UserLocal
+import br.net.easify.tracker.database.model.DbToken
 
 @Dao
 interface  TokenDao {
 
     @Query("SELECT * FROM token LIMIT 1")
-    fun get(): TokenLocal?
+    fun get(): DbToken?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(token: TokenLocal?)
+    fun insert(dbToken: DbToken?)
 
     @Query("DELETE FROM token")
     fun delete()
