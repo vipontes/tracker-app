@@ -1,7 +1,6 @@
 package br.net.easify.tracker.view.fragments
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +32,7 @@ class HomeFragment : Fragment() {
     private lateinit var mapController: MapController
     private lateinit var myLocationOverlay: MyLocationNewOverlay
     private lateinit var dataBinding: FragmentHomeBinding
-    private var trackerActivity: DbActivity? = null
+    private lateinit var trackerActivity: DbActivity
     private var alertDialog: AlertDialog? = null
 
     private val trackerActivityStateObserver = Observer<TrackerActivityState> { state: TrackerActivityState ->
@@ -69,6 +68,7 @@ class HomeFragment : Fragment() {
 
     private val trackerActivityObserver = Observer<DbActivity> {
         trackerActivity = it
+        dataBinding.trackerActivity = trackerActivity
     }
 
     @SuppressLint("MissingPermission")
@@ -172,7 +172,6 @@ class HomeFragment : Fragment() {
         super.onResume()
         dataBinding.mapView.onResume()
         dataBinding.spinner.visibility = View.VISIBLE
-        viewModel.stopLocationService()
     }
 
     override fun onPause() {

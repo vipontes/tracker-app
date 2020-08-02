@@ -49,6 +49,10 @@
             android:name=".background.services.LocationService"
             android:enabled="true" />
 
+        <service
+            android:name=".background.services.TimerService"
+            android:enabled="true" />
+
         <receiver
             android:name=".background.receivers.LocationServiceBootReceiver"
             android:enabled="true"

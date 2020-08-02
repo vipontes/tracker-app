@@ -10,6 +10,7 @@ class Constants {
         val altitude = "altitude"
         val latitude = "latitude"
         val longitude = "longitude"
+        val elapsedTime = "elapsedTime"
         val resultCode = "resultCode"
     }
 }

@@ -13,6 +13,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.background.services.LocationService
+import br.net.easify.tracker.background.services.TimerService
 import br.net.easify.tracker.database.AppDatabase
 import br.net.easify.tracker.database.model.DbActivity
 import br.net.easify.tracker.database.model.DbRoute
@@ -55,12 +56,33 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private val onTimerServiceNotification: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val resultCode = intent.getIntExtra(Constants.resultCode, Activity.RESULT_CANCELED)
+            if (resultCode == Activity.RESULT_OK) {
+                var activity = trackerActivity.value
+                activity?.let {
+                    val elapsedTime = intent.getLongExtra(Constants.elapsedTime, 0)
+                    val displayData = Formatter.hmsTimeFormatter(elapsedTime)
+                    displayData?.let {
+                        activity.duration = displayData
+                        trackerActivity.value = activity
+                        database.activityDao().update(activity)
+                    }
+                }
+            }
+        }
+    }
+
     init {
         trackerActivityState.value = TrackerActivityState.idle
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
 
-        val intentFilter = IntentFilter(LocationService.locationChangeAction)
-        LocalBroadcastManager.getInstance(getApplication()).registerReceiver(onLocationServiceNotification, intentFilter)
+        val locationIntent = IntentFilter(LocationService.locationChangeAction)
+        LocalBroadcastManager.getInstance(getApplication()).registerReceiver(onLocationServiceNotification, locationIntent)
+
+        val timerIntent = IntentFilter(TimerService.timerServiceElapsedTimeChanged)
+        LocalBroadcastManager.getInstance(getApplication()).registerReceiver(onTimerServiceNotification, timerIntent)
 
         trackerActivity.value = DbActivity(
             0,
@@ -91,6 +113,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         activity?.let {
 
             if (activity.in_progress == 1) {
+                trackerActivityState.value = TrackerActivityState.started
                 val routeId = activity.user_route_id
                 val routePathList = database.routePathDao().getPathFromRoute(routeId)
                 if (routePathList.isNotEmpty()) {
@@ -98,7 +121,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     val latitude = routePath.user_route_path_lat
                     val longitude = routePath.user_route_path_lng
                     currentLocation.value = GeoPoint(latitude, longitude)
-                    trackerActivityState.value = TrackerActivityState.started
                 }
             }
         }
@@ -123,6 +145,20 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         return true
+    }
+
+    fun startTimerService() {
+        val intent = Intent(getApplication(), TimerService::class.java)
+        if (!serviceHelper.isMyServiceRunning(TimerService::class.java)) {
+            (getApplication() as MainApplication).startService(intent)
+        }
+    }
+
+    fun stopTimerService() {
+        val intent = Intent(getApplication(), TimerService::class.java)
+        if (serviceHelper.isMyServiceRunning(TimerService::class.java)) {
+            (getApplication() as MainApplication).stopService(intent)
+        }
     }
 
     fun startTracker() {
@@ -167,6 +203,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     trackerActivityState.value = TrackerActivityState.started
 
                     trackerActivity.value = activity
+
+                    startTimerService()
                 } else {
                     // Report error
                     errorMessage.value = "Could not start activity."
@@ -192,6 +230,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             prefs.removeCurrentActivity()
 
             trackerActivityState.value = TrackerActivityState.idle
+
+            trackerActivity.value = activity
+
+            stopTimerService()
         }
     }
 
@@ -202,6 +244,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     override fun onCleared() {
         super.onCleared()
         LocalBroadcastManager.getInstance(getApplication()).unregisterReceiver(onLocationServiceNotification)
+        LocalBroadcastManager.getInstance(getApplication()).unregisterReceiver(onTimerServiceNotification)
         disposable.clear()
     }
 }
