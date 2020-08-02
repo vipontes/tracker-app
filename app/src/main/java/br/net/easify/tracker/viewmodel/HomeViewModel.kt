@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.MainApplication
+import br.net.easify.tracker.R
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.database.AppDatabase
 import br.net.easify.tracker.database.model.DbActivity
@@ -32,6 +33,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val errorMessage by lazy { MutableLiveData<String>() }
     val trackerActivityState by lazy { MutableLiveData<TrackerActivityState>() }
     val currentLocation by lazy { MutableLiveData<GeoPoint>() }
+    val trackerActivity by lazy { MutableLiveData<DbActivity>() }
 
     @Inject
     lateinit var serviceHelper: ServiceHelper
@@ -59,6 +61,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         val intentFilter = IntentFilter(LocationService.locationChangeAction)
         LocalBroadcastManager.getInstance(getApplication()).registerReceiver(onLocationServiceNotification, intentFilter)
+
+        trackerActivity.value = DbActivity(
+            0,
+            0,
+            getApplication<Application>().resources.getString(R.string.default_duration),
+            getApplication<Application>().resources.getString(R.string.default_distance),
+            getApplication<Application>().resources.getString(R.string.default_calories),
+            getApplication<Application>().resources.getString(R.string.default_rhythm),
+            0,
+            0,
+            "",
+            null
+        )
 
         checkRunningActivity()
     }
@@ -94,12 +109,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val gpsIntent = Intent(getApplication(), gpsService::class.java)
         if (!serviceHelper.isMyServiceRunning(gpsService::class.java)) {
             (getApplication() as MainApplication).startService(gpsIntent)
-            return true
-        } else {
-            errorMessage.value = "Could not start location service."
         }
 
-        return false
+        return true
     }
 
     fun stopLocationService(): Boolean {
@@ -110,7 +122,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return true
         }
 
-        return false
+        return true
     }
 
     fun startTracker() {
@@ -134,7 +146,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     database.routePathDao().insert(routePath)
 
                     // 3 - Create an activity
-                    val activity = DbActivity(0, routeId, 0.0, 0.0, 0.0, 1, 0, databaseFieldTime, null)
+                    val activity = DbActivity(
+                        0,
+                        routeId,
+                        getApplication<Application>().resources.getString(R.string.default_duration),
+                        getApplication<Application>().resources.getString(R.string.default_distance),
+                        getApplication<Application>().resources.getString(R.string.default_calories),
+                        getApplication<Application>().resources.getString(R.string.default_rhythm),
+                        1,
+                        0,
+                        databaseFieldTime,
+                        null
+                    )
                     val activityId = database.activityDao().insert(activity)
 
                     // 4 - Save activityId to preferences
@@ -142,6 +165,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
                     // 5 - Report tracker state
                     trackerActivityState.value = TrackerActivityState.started
+
+                    trackerActivity.value = activity
                 } else {
                     // Report error
                     errorMessage.value = "Could not start activity."

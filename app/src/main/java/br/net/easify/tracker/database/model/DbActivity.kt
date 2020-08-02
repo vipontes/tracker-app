@@ -9,9 +9,10 @@ data class DbActivity(
     @PrimaryKey(autoGenerate = true)
     val activity_id: Long,
     val user_route_id: Long,
-    var distance: Double,
-    var calories: Double,
-    var rhythm: Double,
+    var duration: String,
+    var distance: String,
+    var calories: String,
+    var rhythm: String,
     var in_progress: Int,
     var sync: Int,
     var started_at: String,

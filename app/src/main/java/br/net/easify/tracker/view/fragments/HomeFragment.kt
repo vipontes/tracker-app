@@ -1,6 +1,7 @@
 package br.net.easify.tracker.view.fragments
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,20 +9,20 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
+import br.net.easify.tracker.database.model.DbActivity
+import br.net.easify.tracker.databinding.FragmentHomeBinding
 import br.net.easify.tracker.enums.TrackerActivityState
 import br.net.easify.tracker.utils.CustomAlertDialog
 import br.net.easify.tracker.viewmodel.HomeViewModel
-import com.google.android.material.button.MaterialButton
-import kotlinx.android.synthetic.main.fragment_home.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapController
-import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
@@ -29,26 +30,24 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
-    private lateinit var mapView: MapView
     private lateinit var mapController: MapController
     private lateinit var myLocationOverlay: MyLocationNewOverlay
-    private lateinit var startStopButton: MaterialButton
-    private lateinit var takePictureButton: MaterialButton
-
+    private lateinit var dataBinding: FragmentHomeBinding
+    private var trackerActivity: DbActivity? = null
     private var alertDialog: AlertDialog? = null
 
     private val trackerActivityStateObserver = Observer<TrackerActivityState> { state: TrackerActivityState ->
         state.let {
             if (it == TrackerActivityState.idle) {
-                startStopButton.text =requireContext().getString(R.string.start)
-                startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
-                takePictureButton.visibility = View.GONE
-                spinner.visibility = View.GONE
+                dataBinding.startStopButton.text =requireContext().getString(R.string.start)
+                dataBinding.startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
+                dataBinding.takePictureButton.visibility = View.GONE
+                dataBinding.spinner.visibility = View.GONE
             } else if (it == TrackerActivityState.started) {
-                startStopButton.text =requireContext().getString(R.string.stop)
-                startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorRed)
-                takePictureButton.visibility = View.VISIBLE
-                spinner.visibility = View.VISIBLE
+                dataBinding.startStopButton.text =requireContext().getString(R.string.stop)
+                dataBinding.startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorRed)
+                dataBinding.takePictureButton.visibility = View.VISIBLE
+                dataBinding.spinner.visibility = View.VISIBLE
             }
         }
     }
@@ -59,6 +58,7 @@ class HomeFragment : Fragment() {
             mapController.animateTo(it)
             if ( viewModel.getTrackerState() == TrackerActivityState.idle ) {
                 viewModel.stopLocationService()
+                dataBinding.spinner.visibility = View.GONE
             }
         }
     }
@@ -67,32 +67,52 @@ class HomeFragment : Fragment() {
         Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
     }
 
+    private val trackerActivityObserver = Observer<DbActivity> {
+        trackerActivity = it
+    }
+
     @SuppressLint("MissingPermission")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-
-        startStopButton = view.findViewById(R.id.startStopButton)
-        takePictureButton = view.findViewById(R.id.takePictureButton)
-        mapView = view.findViewById(R.id.mapView)
+        dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
 
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         viewModel.trackerActivityState.observe(viewLifecycleOwner, trackerActivityStateObserver)
         viewModel.currentLocation.observe(viewLifecycleOwner, currentLocationObserver)
         viewModel.errorMessage.observe(viewLifecycleOwner, errorMessageObserver)
+        viewModel.trackerActivity.observe(viewLifecycleOwner, trackerActivityObserver)
+
+        return dataBinding.root;
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         initializeMap()
         initializeStartStopButton()
         initializetakePictureButton()
 
-        return view;
+        // Initialize DataBinding
+        trackerActivity = DbActivity(
+            0,
+            0,
+            requireContext().getString(R.string.default_duration),
+            requireContext().getString(R.string.default_distance),
+            requireContext().getString(R.string.default_calories),
+            requireContext().getString(R.string.default_rhythm),
+            0,
+            0,
+            "",
+            null
+        )
+
+        dataBinding.trackerActivity = trackerActivity
     }
 
     private fun initializeStartStopButton() {
-        startStopButton.setOnClickListener(View.OnClickListener {
+        dataBinding.startStopButton.setOnClickListener(View.OnClickListener {
             viewModel.getTrackerState()?.let {
                 if (it == TrackerActivityState.idle) {
                     startTrackerActivity()
@@ -112,7 +132,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun initializetakePictureButton() {
-        takePictureButton.setOnClickListener(View.OnClickListener {
+        dataBinding.takePictureButton.setOnClickListener(View.OnClickListener {
 
         })
     }
@@ -130,43 +150,44 @@ class HomeFragment : Fragment() {
     }
 
     private fun initializeMap() {
-        mapView.setUseDataConnection(true)
-        mapView.setTileSource(TileSourceFactory.MAPNIK)
-        mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
-        mapView.setMultiTouchControls(true)
+        dataBinding.mapView.setUseDataConnection(true)
+        dataBinding.mapView.setTileSource(TileSourceFactory.MAPNIK)
+        dataBinding.mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        dataBinding.mapView.setMultiTouchControls(true)
 
         val gpsMyLocationProvider = GpsMyLocationProvider(context)
         gpsMyLocationProvider.locationUpdateMinDistance = 10f
         gpsMyLocationProvider.locationUpdateMinTime = 5000
 
-        myLocationOverlay = MyLocationNewOverlay(gpsMyLocationProvider, mapView)
+        myLocationOverlay = MyLocationNewOverlay(gpsMyLocationProvider, dataBinding.mapView)
         myLocationOverlay.enableMyLocation();
 
-        mapView.overlays.add(myLocationOverlay);
+        dataBinding.mapView.overlays.add(myLocationOverlay);
 
-        mapController = mapView.controller as MapController
+        mapController = dataBinding.mapView.controller as MapController
         mapController.setZoom(16)
     }
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
-        spinner.visibility = View.VISIBLE
+        dataBinding.mapView.onResume()
+        dataBinding.spinner.visibility = View.VISIBLE
+        viewModel.stopLocationService()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        dataBinding.mapView.onPause()
     }
 
     fun addMarker(center: GeoPoint) {
 
-        var marker = Marker(mapView)
+        var marker = Marker(dataBinding.mapView)
         marker.position = center
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        mapView.overlays.clear()
-        mapView.overlays.add(marker)
+        dataBinding.mapView.overlays.clear()
+        dataBinding.mapView.overlays.add(marker)
 
-        mapView.invalidate()
+        dataBinding.mapView.invalidate()
     }
 }
