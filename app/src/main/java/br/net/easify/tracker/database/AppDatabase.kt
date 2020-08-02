@@ -4,21 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import br.net.easify.tracker.database.dao.RouteDao
-import br.net.easify.tracker.database.dao.RoutePathDao
-import br.net.easify.tracker.database.dao.TokenDao
-import br.net.easify.tracker.database.dao.UserDao
-import br.net.easify.tracker.database.model.DbRoute
-import br.net.easify.tracker.database.model.DbRoutePath
-import br.net.easify.tracker.database.model.DbToken
-import br.net.easify.tracker.database.model.DbUser
+import br.net.easify.tracker.database.dao.*
+import br.net.easify.tracker.database.model.*
 
 @Database(
     entities = [
         DbUser::class,
         DbToken::class,
         DbRoute::class,
-        DbRoutePath::class
+        DbRoutePath::class,
+        DbActivity::class
     ],
     version = 1,
     exportSchema = false
@@ -28,6 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tokenDao(): TokenDao
     abstract fun routeDao(): RouteDao
     abstract fun routePathDao(): RoutePathDao
+    abstract fun activityDao(): ActivityDao
 
     companion object {
         private var instance: AppDatabase? = null

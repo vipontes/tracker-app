@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class DbUser(
 
     @PrimaryKey
-    val user_Id: Int,
+    var user_Id: Long,
     var user_name: String,
     var user_email: String,
     var user_password: String,

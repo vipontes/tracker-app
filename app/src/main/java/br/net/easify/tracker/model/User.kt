@@ -1,7 +1,7 @@
 package br.net.easify.tracker.model
 
 data class User (
-    var userId : Int,
+    var userId : Long,
     var userName : String,
     var userEmail : String,
     var userPassword : String,

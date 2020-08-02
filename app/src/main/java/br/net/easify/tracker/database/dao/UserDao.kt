@@ -7,7 +7,7 @@ import br.net.easify.tracker.database.model.DbUser
 interface UserDao {
 
     @Query("SELECT * FROM user WHERE user_id = :userId")
-    fun getUser(userId: Int?): DbUser?
+    fun getUser(userId: Long?): DbUser?
 
     @Query("SELECT * FROM user LIMIT 1")
     fun getLoggedUser(): DbUser?
@@ -16,10 +16,10 @@ interface UserDao {
     fun getAll(): List<DbUser>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(dbUser: DbUser)
+    fun insert(dbUser: DbUser): Long
 
     @Query("DELETE FROM user WHERE user_id = :userId")
-    fun delete(userId: Int)
+    fun delete(userId: Long)
 
     @Query("DELETE FROM user")
     fun delete()

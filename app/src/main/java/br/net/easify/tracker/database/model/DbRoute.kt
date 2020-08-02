@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "user_route")
 data class DbRoute(
 
-    @PrimaryKey
-    val user_route_id: Int,
-    val user_id: Int,
+    @PrimaryKey(autoGenerate = true)
+    var user_route_id: Long,
+    var user_id: Long,
     var user_route_description: String,
     var user_route_start_time: String,
     var user_route_end_time: String?

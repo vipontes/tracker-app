@@ -8,16 +8,16 @@ import br.net.easify.tracker.database.model.DbRoutePath
 interface RoutePathDao {
 
     @Query("SELECT * FROM user_route_path WHERE user_route_path_id = :userRoutePathId")
-    fun getRoutePath(userRoutePathId: Int): DbRoutePath?
+    fun getRoutePath(userRoutePathId: Long): DbRoutePath?
 
     @Query("SELECT * FROM user_route_path WHERE user_route_id = :userRouteId ORDER BY user_route_path_id ASC")
-    fun getPathFromRoute(userRouteId: Int): List<DbRoutePath>
+    fun getPathFromRoute(userRouteId: Long): List<DbRoutePath>
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    fun insert(dbRoutePath: DbRoutePath)
+    fun insert(dbRoutePath: DbRoutePath): Long
 
     @Query("DELETE FROM user_route_path WHERE user_route_path_id = :userRoutePathId")
-    fun delete(userRoutePathId: Int)
+    fun delete(userRoutePathId: Long)
 
     @Update
     fun update(dbRoutePath: DbRoutePath)

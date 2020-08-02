@@ -1,11 +1,6 @@
 package br.net.easify.tracker.view.fragments
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,12 +11,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.R
-import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.enums.TrackerActivityState
-import br.net.easify.tracker.model.ErrorResponse
-import br.net.easify.tracker.utils.Constants
 import br.net.easify.tracker.utils.CustomAlertDialog
 import br.net.easify.tracker.viewmodel.HomeViewModel
 import com.google.android.material.button.MaterialButton
@@ -41,36 +32,10 @@ class HomeFragment : Fragment() {
     private lateinit var mapView: MapView
     private lateinit var mapController: MapController
     private lateinit var myLocationOverlay: MyLocationNewOverlay
-    private var currentLocation = GeoPoint(0, 0)
     private lateinit var startStopButton: MaterialButton
     private lateinit var takePictureButton: MaterialButton
 
     private var alertDialog: AlertDialog? = null
-
-    private val onLocationServiceNotification: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val resultCode = intent.getIntExtra(Constants.resultCode, Activity.RESULT_CANCELED)
-            if (resultCode == Activity.RESULT_OK) {
-                val latitude = intent.getDoubleExtra(Constants.latitude, 0.0)
-                val longitude = intent.getDoubleExtra(Constants.longitude, 0.0)
-
-                currentLocation = GeoPoint(latitude, longitude)
-                addMarker(currentLocation)
-                mapController.animateTo(currentLocation)
-
-                val state = viewModel.getTrackerActivityState()
-                state?.let {
-                    if (it == TrackerActivityState.idle) {
-                        viewModel.stopLocationService()
-                    } else if (it == TrackerActivityState.started) {
-                        // Save path
-                    }
-                }
-
-                spinner.visibility = View.GONE
-            }
-        }
-    }
 
     private val trackerActivityStateObserver = Observer<TrackerActivityState> { state: TrackerActivityState ->
         state.let {
@@ -78,12 +43,28 @@ class HomeFragment : Fragment() {
                 startStopButton.text =requireContext().getString(R.string.start)
                 startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
                 takePictureButton.visibility = View.GONE
+                spinner.visibility = View.GONE
             } else if (it == TrackerActivityState.started) {
                 startStopButton.text =requireContext().getString(R.string.stop)
                 startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorRed)
                 takePictureButton.visibility = View.VISIBLE
+                spinner.visibility = View.VISIBLE
             }
         }
+    }
+
+    private val currentLocationObserver = Observer<GeoPoint> { centerPoint: GeoPoint ->
+        centerPoint.let {
+            addMarker(it)
+            mapController.animateTo(it)
+            if ( viewModel.getTrackerState() == TrackerActivityState.idle ) {
+                viewModel.stopLocationService()
+            }
+        }
+    }
+
+    private val errorMessageObserver = Observer<String> {
+        Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
     }
 
     @SuppressLint("MissingPermission")
@@ -96,12 +77,12 @@ class HomeFragment : Fragment() {
 
         startStopButton = view.findViewById(R.id.startStopButton)
         takePictureButton = view.findViewById(R.id.takePictureButton)
+        mapView = view.findViewById(R.id.mapView)
 
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
-
         viewModel.trackerActivityState.observe(viewLifecycleOwner, trackerActivityStateObserver)
-
-        mapView = view.findViewById(R.id.mapView)
+        viewModel.currentLocation.observe(viewLifecycleOwner, currentLocationObserver)
+        viewModel.errorMessage.observe(viewLifecycleOwner, errorMessageObserver)
 
         initializeMap()
         initializeStartStopButton()
@@ -112,18 +93,15 @@ class HomeFragment : Fragment() {
 
     private fun initializeStartStopButton() {
         startStopButton.setOnClickListener(View.OnClickListener {
-            viewModel.isActivityStarted.value?.let {
-                val isActivityStarted = it
-                if (!isActivityStarted) {
+            viewModel.getTrackerState()?.let {
+                if (it == TrackerActivityState.idle) {
                     startTrackerActivity()
-                    viewModel.isActivityStarted.value = true
                 } else {
                     alertDialog = CustomAlertDialog.show(requireContext(), "Tracker Activity",
                         "Do you really want to finish your activity?",
                         "Yes", View.OnClickListener {
                             alertDialog!!.dismiss()
                             stopTrackerActivity()
-                            viewModel.isActivityStarted.value = false
                         },
                         "No",
                         View.OnClickListener { alertDialog!!.dismiss() }
@@ -140,13 +118,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun startTrackerActivity() {
-
-        viewModel.startLocationService(true)
+        if ( viewModel.startLocationService() ) {
+            viewModel.startTracker()
+        }
     }
 
     private fun stopTrackerActivity() {
-
-        viewModel.stopLocationService()
+        if ( viewModel.stopLocationService() ) {
+            viewModel.stopTracker()
+        }
     }
 
     private fun initializeMap() {
@@ -171,19 +151,12 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-
-        val intentFilter = IntentFilter(LocationService.locationChangeAction)
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(onLocationServiceNotification, intentFilter)
-
-        viewModel.startLocationService()
-
         spinner.visibility = View.VISIBLE
     }
 
     override fun onPause() {
         super.onPause()
         mapView.onPause()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(onLocationServiceNotification);
     }
 
     fun addMarker(center: GeoPoint) {
