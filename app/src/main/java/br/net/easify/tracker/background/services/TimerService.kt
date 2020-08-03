@@ -5,7 +5,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import br.net.easify.tracker.utils.Constants
+import br.net.easify.tracker.helpers.Constants
 import java.util.*
 
 class TimerService : Service() {

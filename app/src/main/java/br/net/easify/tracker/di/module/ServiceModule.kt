@@ -1,8 +1,7 @@
 package br.net.easify.tracker.di.module
 
 import android.app.Application
-import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.utils.ServiceHelper
+import br.net.easify.tracker.helpers.ServiceHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

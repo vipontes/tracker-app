@@ -1,4 +1,4 @@
-package br.net.easify.tracker.utils
+package br.net.easify.tracker.helpers
 
 import android.content.Context
 import androidx.preference.PreferenceManager

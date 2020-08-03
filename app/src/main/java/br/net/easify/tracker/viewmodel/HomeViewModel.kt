@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -19,11 +18,10 @@ import br.net.easify.tracker.database.model.DbActivity
 import br.net.easify.tracker.database.model.DbRoute
 import br.net.easify.tracker.database.model.DbRoutePath
 import br.net.easify.tracker.enums.TrackerActivityState
-import br.net.easify.tracker.model.User
-import br.net.easify.tracker.utils.Constants
-import br.net.easify.tracker.utils.Formatter
-import br.net.easify.tracker.utils.ServiceHelper
-import br.net.easify.tracker.utils.SharedPreferencesHelper
+import br.net.easify.tracker.helpers.Constants
+import br.net.easify.tracker.helpers.Formatter
+import br.net.easify.tracker.helpers.ServiceHelper
+import br.net.easify.tracker.helpers.SharedPreferencesHelper
 import io.reactivex.disposables.CompositeDisposable
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
@@ -52,6 +50,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 val latitude = intent.getDoubleExtra(Constants.latitude, 0.0)
                 val longitude = intent.getDoubleExtra(Constants.longitude, 0.0)
                 currentLocation.value = GeoPoint(latitude, longitude)
+
+                val activity = trackerActivity.value
+                activity?.let {
+                    if (activity.in_progress == 1) {
+                        val currentTime = Formatter.currentDateTimeYMDAsString()
+                        val routeId = activity.user_route_id
+                        val path = DbRoutePath(0, routeId, latitude, longitude, currentTime)
+                        database.routePathDao().insert(path)
+                    }
+                }
             }
         }
     }

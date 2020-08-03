@@ -13,8 +13,8 @@ import br.net.easify.tracker.model.ErrorResponse
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.model.User
-import br.net.easify.tracker.services.LoginService
-import br.net.easify.tracker.services.UserService
+import br.net.easify.tracker.api.LoginService
+import br.net.easify.tracker.api.UserService
 import com.auth0.android.jwt.JWT
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

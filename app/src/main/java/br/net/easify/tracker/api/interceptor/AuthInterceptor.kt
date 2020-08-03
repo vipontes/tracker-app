@@ -1,4 +1,4 @@
-package br.net.easify.tracker.services.interceptor
+package br.net.easify.tracker.api.interceptor
 
 import br.net.easify.tracker.database.model.DbToken
 import okhttp3.Interceptor

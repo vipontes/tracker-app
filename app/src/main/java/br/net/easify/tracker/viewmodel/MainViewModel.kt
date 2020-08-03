@@ -1,13 +1,11 @@
 package br.net.easify.tracker.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.background.services.LocationService
-import br.net.easify.tracker.model.LoginBody
-import br.net.easify.tracker.utils.ServiceHelper
+import br.net.easify.tracker.helpers.ServiceHelper
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 

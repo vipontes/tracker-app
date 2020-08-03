@@ -1,4 +1,4 @@
-package br.net.easify.tracker.utils
+package br.net.easify.tracker.helpers
 
 import java.text.SimpleDateFormat
 import java.util.*

@@ -13,7 +13,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.R
-import br.net.easify.tracker.utils.Constants
+import br.net.easify.tracker.helpers.Constants
 import br.net.easify.tracker.view.main.MainActivity
 
 class LocationService : Service(), LocationListener {

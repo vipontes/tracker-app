@@ -7,7 +7,7 @@ import android.os.Build
 import br.net.easify.tracker.di.component.AppComponent
 import br.net.easify.tracker.di.component.DaggerAppComponent
 import br.net.easify.tracker.di.module.AppModule
-import br.net.easify.tracker.utils.Constants
+import br.net.easify.tracker.helpers.Constants
 
 class MainApplication : Application() {
 

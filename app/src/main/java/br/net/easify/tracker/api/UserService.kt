@@ -1,10 +1,10 @@
-package br.net.easify.tracker.services
+package br.net.easify.tracker.api
 
 import br.net.easify.tracker.database.model.DbToken
 import br.net.easify.tracker.interfaces.IUser
 import br.net.easify.tracker.model.User
-import br.net.easify.tracker.services.interceptor.AuthInterceptor
-import br.net.easify.tracker.utils.Constants
+import br.net.easify.tracker.api.interceptor.AuthInterceptor
+import br.net.easify.tracker.helpers.Constants
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

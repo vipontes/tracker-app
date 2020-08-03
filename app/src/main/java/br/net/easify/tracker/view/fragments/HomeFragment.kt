@@ -16,7 +16,7 @@ import br.net.easify.tracker.R
 import br.net.easify.tracker.database.model.DbActivity
 import br.net.easify.tracker.databinding.FragmentHomeBinding
 import br.net.easify.tracker.enums.TrackerActivityState
-import br.net.easify.tracker.utils.CustomAlertDialog
+import br.net.easify.tracker.helpers.CustomAlertDialog
 import br.net.easify.tracker.viewmodel.HomeViewModel
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint

@@ -1,7 +1,7 @@
 package br.net.easify.tracker.di.module
 
 import android.app.Application
-import br.net.easify.tracker.utils.SharedPreferencesHelper
+import br.net.easify.tracker.helpers.SharedPreferencesHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

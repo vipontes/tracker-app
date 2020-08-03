@@ -1,4 +1,4 @@
-package br.net.easify.tracker.utils
+package br.net.easify.tracker.helpers
 
 
 import br.net.easify.tracker.model.ErrorResponse
