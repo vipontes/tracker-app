@@ -24,19 +24,16 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapController
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
     private lateinit var mapController: MapController
-    private lateinit var myLocationOverlay: MyLocationNewOverlay
     private lateinit var dataBinding: FragmentHomeBinding
     private lateinit var trackerActivity: DbActivity
     private var alertDialog: AlertDialog? = null
     private var currentLocation: GeoPoint? = null
-    private var polyline = Polyline()
 
     private val trackerActivityStateObserver = Observer<TrackerActivityState> { state: TrackerActivityState ->
         state.let {
@@ -56,17 +53,18 @@ class HomeFragment : Fragment() {
 
     private val currentLocationObserver = Observer<GeoPoint> { centerPoint: GeoPoint ->
         centerPoint.let {
-            addMarker(it)
+            currentLocation = it
 
+            dataBinding.mapView.overlays.clear()
+            addMarker(it)
             mapController.animateTo(it)
             if (viewModel.getTrackerState() == TrackerActivityState.idle) {
                 viewModel.stopLocationService()
                 dataBinding.spinner.visibility = View.GONE
-                currentLocation = it
             } else {
                 drawPath(viewModel.getCurrentTrackerPath())
-                currentLocation = it
             }
+            dataBinding.mapView.invalidate()
         }
     }
 
@@ -161,15 +159,6 @@ class HomeFragment : Fragment() {
         dataBinding.mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         dataBinding.mapView.setMultiTouchControls(true)
 
-        val gpsMyLocationProvider = GpsMyLocationProvider(context)
-        gpsMyLocationProvider.locationUpdateMinDistance = 10f
-        gpsMyLocationProvider.locationUpdateMinTime = 5000
-
-        myLocationOverlay = MyLocationNewOverlay(gpsMyLocationProvider, dataBinding.mapView)
-        myLocationOverlay.enableMyLocation();
-
-        dataBinding.mapView.overlays.add(myLocationOverlay);
-
         mapController = dataBinding.mapView.controller as MapController
         mapController.setZoom(16)
     }
@@ -177,33 +166,26 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         dataBinding.mapView.onResume()
-        dataBinding.spinner.visibility = View.VISIBLE
-        polyline.onResume()
     }
 
     override fun onPause() {
         super.onPause()
         dataBinding.mapView.onPause()
-        polyline.onPause()
     }
 
     fun addMarker(center: GeoPoint) {
-
         var marker = Marker(dataBinding.mapView)
         marker.position = center
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        dataBinding.mapView.overlays.clear()
         dataBinding.mapView.overlays.add(marker)
-
-        dataBinding.mapView.invalidate()
     }
 
     private fun drawPath(path: ArrayList<GeoPoint>) {
-        polyline.setColor(ContextCompat.getColor(requireContext(), R.color.colorAccent));
+        var polyline = Polyline(dataBinding.mapView, true, false)
+        polyline.setColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
         for (point in path) {
             polyline.addPoint(point)
         }
         dataBinding.mapView.overlays.add(polyline)
-        dataBinding.mapView.invalidate()
     }
 }
