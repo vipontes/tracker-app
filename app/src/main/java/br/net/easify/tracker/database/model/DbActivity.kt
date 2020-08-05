@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class DbActivity(
 
     @PrimaryKey(autoGenerate = true)
-    val activity_id: Long,
+    val activity_id: Long?,
     val user_route_id: Long,
     var duration: String,
     var distance: String,

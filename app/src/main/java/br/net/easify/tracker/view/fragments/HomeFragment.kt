@@ -23,6 +23,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapController
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
@@ -34,16 +35,18 @@ class HomeFragment : Fragment() {
     private lateinit var dataBinding: FragmentHomeBinding
     private lateinit var trackerActivity: DbActivity
     private var alertDialog: AlertDialog? = null
+    private var currentLocation: GeoPoint? = null
+    private var polyline = Polyline()
 
     private val trackerActivityStateObserver = Observer<TrackerActivityState> { state: TrackerActivityState ->
         state.let {
             if (it == TrackerActivityState.idle) {
-                dataBinding.startStopButton.text =requireContext().getString(R.string.start)
+                dataBinding.startStopButton.text = requireContext().getString(R.string.start)
                 dataBinding.startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
                 dataBinding.takePictureButton.visibility = View.GONE
                 dataBinding.spinner.visibility = View.GONE
             } else if (it == TrackerActivityState.started) {
-                dataBinding.startStopButton.text =requireContext().getString(R.string.stop)
+                dataBinding.startStopButton.text = requireContext().getString(R.string.stop)
                 dataBinding.startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorRed)
                 dataBinding.takePictureButton.visibility = View.VISIBLE
                 dataBinding.spinner.visibility = View.VISIBLE
@@ -54,10 +57,15 @@ class HomeFragment : Fragment() {
     private val currentLocationObserver = Observer<GeoPoint> { centerPoint: GeoPoint ->
         centerPoint.let {
             addMarker(it)
+
             mapController.animateTo(it)
-            if ( viewModel.getTrackerState() == TrackerActivityState.idle ) {
+            if (viewModel.getTrackerState() == TrackerActivityState.idle) {
                 viewModel.stopLocationService()
                 dataBinding.spinner.visibility = View.GONE
+                currentLocation = it
+            } else {
+                drawPath(viewModel.getCurrentTrackerPath())
+                currentLocation = it
             }
         }
     }
@@ -94,7 +102,6 @@ class HomeFragment : Fragment() {
         initializeStartStopButton()
         initializetakePictureButton()
 
-        // Initialize DataBinding
         trackerActivity = DbActivity(
             0,
             0,
@@ -107,7 +114,6 @@ class HomeFragment : Fragment() {
             "",
             null
         )
-
         dataBinding.trackerActivity = trackerActivity
     }
 
@@ -138,13 +144,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun startTrackerActivity() {
-        if ( viewModel.startLocationService() ) {
+        if (viewModel.startLocationService()) {
             viewModel.startTracker()
         }
     }
 
     private fun stopTrackerActivity() {
-        if ( viewModel.stopLocationService() ) {
+        if (viewModel.stopLocationService()) {
             viewModel.stopTracker()
         }
     }
@@ -172,11 +178,13 @@ class HomeFragment : Fragment() {
         super.onResume()
         dataBinding.mapView.onResume()
         dataBinding.spinner.visibility = View.VISIBLE
+        polyline.onResume()
     }
 
     override fun onPause() {
         super.onPause()
         dataBinding.mapView.onPause()
+        polyline.onPause()
     }
 
     fun addMarker(center: GeoPoint) {
@@ -187,6 +195,15 @@ class HomeFragment : Fragment() {
         dataBinding.mapView.overlays.clear()
         dataBinding.mapView.overlays.add(marker)
 
+        dataBinding.mapView.invalidate()
+    }
+
+    private fun drawPath(path: ArrayList<GeoPoint>) {
+        polyline.setColor(ContextCompat.getColor(requireContext(), R.color.colorAccent));
+        for (point in path) {
+            polyline.addPoint(point)
+        }
+        dataBinding.mapView.overlays.add(polyline)
         dataBinding.mapView.invalidate()
     }
 }

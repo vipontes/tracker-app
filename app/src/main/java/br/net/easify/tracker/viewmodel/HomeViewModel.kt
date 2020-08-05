@@ -50,16 +50,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 val latitude = intent.getDoubleExtra(Constants.latitude, 0.0)
                 val longitude = intent.getDoubleExtra(Constants.longitude, 0.0)
                 currentLocation.value = GeoPoint(latitude, longitude)
-
-                val activity = trackerActivity.value
-                activity?.let {
-                    if (activity.in_progress == 1) {
-                        val currentTime = Formatter.currentDateTimeYMDAsString()
-                        val routeId = activity.user_route_id
-                        val path = DbRoutePath(0, routeId, latitude, longitude, currentTime)
-                        database.routePathDao().insert(path)
-                    }
-                }
             }
         }
     }
@@ -181,17 +171,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 val databaseFieldTime = Formatter.currentDateTimeYMDAsString();
                 val description = "Activity $startTime"
 
-                val route = DbRoute(0, userId, description, databaseFieldTime, null)
+                val route = DbRoute(null, userId, description, databaseFieldTime, null)
                 val routeId = database.routeDao().insert(route)
 
                 if (routeId > 0) {
                     // 2 - Create a path
-                    val routePath = DbRoutePath(0, routeId, pt.latitude, pt.longitude, databaseFieldTime)
+                    val routePath = DbRoutePath(null, routeId, pt.latitude, pt.longitude, databaseFieldTime)
                     database.routePathDao().insert(routePath)
 
                     // 3 - Create an activity
                     val activity = DbActivity(
-                        0,
+                        null,
                         routeId,
                         getApplication<Application>().resources.getString(R.string.default_duration),
                         getApplication<Application>().resources.getString(R.string.default_distance),
@@ -222,14 +212,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun stopTracker() {
-        var activityId: Long = 0
-        prefs.getCurrentActivity().let {
-            if (it.isNotEmpty()) {
-                activityId = it.toLong()
-            }
-        }
 
-        var activity = database.activityDao().getActivity(activityId)
+        val activity = getCurrentActivity()
         activity?.let {
 
             activity.in_progress = 0
@@ -247,6 +231,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getTrackerState(): TrackerActivityState? {
         return trackerActivityState.value
+    }
+
+    private fun getCurrentActivity(): DbActivity? {
+        var activityId: Long = 0
+        prefs.getCurrentActivity().let {
+            if (it.isNotEmpty()) {
+                activityId = it.toLong()
+            }
+        }
+
+        var activity = database.activityDao().getActivity(activityId)
+        activity?.let {
+            return it
+        }
+
+        return null
+    }
+
+    fun getCurrentTrackerPath() : ArrayList<GeoPoint> {
+        var path: ArrayList<GeoPoint> = arrayListOf()
+
+        val activity = getCurrentActivity()
+        activity?.let {
+            val routeId = activity.user_route_id
+            val routePath = database.routePathDao().getPathFromRoute(routeId)
+            for (point in routePath) {
+                path.add(GeoPoint(point.user_route_path_lat, point.user_route_path_lng))
+            }
+        }
+
+        return path
     }
 
     override fun onCleared() {

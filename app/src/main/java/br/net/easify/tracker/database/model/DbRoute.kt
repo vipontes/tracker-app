@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class DbRoute(
 
     @PrimaryKey(autoGenerate = true)
-    var user_route_id: Long,
+    var user_route_id: Long?,
     var user_id: Long,
     var user_route_description: String,
     var user_route_start_time: String,

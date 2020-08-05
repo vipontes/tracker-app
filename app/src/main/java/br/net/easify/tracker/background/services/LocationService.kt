@@ -1,27 +1,55 @@
 package br.net.easify.tracker.background.services
 
+//import android.location.LocationListener
+//import android.location.LocationManager
+
+import android.Manifest
 import android.app.Activity
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
+import br.net.easify.tracker.database.AppDatabase
+import br.net.easify.tracker.database.model.DbActivity
+import br.net.easify.tracker.database.model.DbRoutePath
 import br.net.easify.tracker.helpers.Constants
+import br.net.easify.tracker.helpers.Formatter
+import br.net.easify.tracker.helpers.SharedPreferencesHelper
 import br.net.easify.tracker.view.main.MainActivity
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.LocationListener
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import javax.inject.Inject
 
-class LocationService : Service(), LocationListener {
 
-    private val defaultLocationInterval = (5 * 1000).toLong() // Milesegundos
-    private val defaultLocationDistance = 5f // Metros
-    private lateinit var locationManager: LocationManager
+class LocationService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
+    private var mGoogleApiClient: GoogleApiClient? = null
+    private var mLocationRequest: LocationRequest? = null
+    private val updateInterval: Long = (3 * 1000)
+    private val fastestUpdateInterval = updateInterval / 2
+    private var context: Context? = null
     private lateinit var lastLocation: Location
+
+    @Inject
+    lateinit var database: AppDatabase
+
+    @Inject
+    lateinit var prefs: SharedPreferencesHelper
 
     companion object {
         val locationChangeAction = "br.net.easify.tracker.background.receivers.LocationBroadcastReceiver"
@@ -30,26 +58,71 @@ class LocationService : Service(), LocationListener {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
+        context = getApplicationContext();
+        if (checkPermsion(context)) {
+            setupLocationService(context!!);
+        }
+
         startForegroundService()
         return START_STICKY
     }
 
+    private fun setupLocationService(context: Context) {
+        if (checkPlayServices()) {
+            mGoogleApiClient = GoogleApiClient.Builder(context)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build()
+            createLocationRequest()
+        }
+    }
+
+    fun checkPermsion(context: Context?): Boolean {
+        val MyVersion = Build.VERSION.SDK_INT
+        return if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                false
+            } else ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    protected fun createLocationRequest() {
+        mLocationRequest = LocationRequest.create()
+        mLocationRequest!!.interval = updateInterval
+        mLocationRequest!!.fastestInterval = fastestUpdateInterval
+        mLocationRequest!!.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        mGoogleApiClient!!.connect()
+    }
+
+    private fun checkPlayServices(): Boolean {
+        val googleAPI = GoogleApiAvailability.getInstance()
+        val result = googleAPI.isGooglePlayServicesAvailable(this)
+        return result == ConnectionResult.SUCCESS
+    }
+
+    private fun startLocationUpdates() {
+        if (mGoogleApiClient!!.isConnected) {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
-
-        locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        try {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, defaultLocationInterval, defaultLocationDistance, this)
-        } catch (ex: SecurityException) {
-        } catch (ex: IllegalArgumentException) {
-        }
-
-        try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, defaultLocationInterval, defaultLocationDistance, this)
-        } catch (ex: SecurityException) {
-        } catch (ex: IllegalArgumentException) {
-        }
+        (application as MainApplication).getAppComponent()?.inject(this)
     }
 
     override fun onDestroy() {
@@ -62,25 +135,21 @@ class LocationService : Service(), LocationListener {
         return null
     }
 
-    override fun onLocationChanged(location: Location?) {
-        location?.let {
-            lastLocation = Location(it)
-
-            val intent = Intent(locationChangeAction)
-            intent.putExtra(Constants.resultCode, Activity.RESULT_OK)
-            intent.putExtra(Constants.provider, lastLocation.provider)
-            intent.putExtra(Constants.altitude, lastLocation.altitude)
-            intent.putExtra(Constants.latitude, lastLocation.latitude)
-            intent.putExtra(Constants.longitude, lastLocation.longitude)
-
-            val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
-            broadcastManager.sendBroadcast(intent)
+    private fun getCurrentActivity(): DbActivity? {
+        var activityId: Long = 0
+        prefs.getCurrentActivity().let {
+            if (it.isNotEmpty()) {
+                activityId = it.toLong()
+            }
         }
-    }
 
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-    override fun onProviderEnabled(provider: String?) {}
-    override fun onProviderDisabled(provider: String?) {}
+        var activity = database.activityDao().getActivity(activityId)
+        activity?.let {
+            return it
+        }
+
+        return null
+    }
 
     private fun startForegroundService() {
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)
@@ -98,5 +167,41 @@ class LocationService : Service(), LocationListener {
 
     private fun stopForegroundService() {
         stopForeground(true)
+    }
+
+    override fun onConnected(bundle: Bundle?) {
+        startLocationUpdates()
+    }
+
+    override fun onConnectionSuspended(i: Int) {
+    }
+
+    override fun onConnectionFailed(connectionResult: ConnectionResult) {
+    }
+
+    override fun onLocationChanged(location: Location?) {
+                location?.let {
+            lastLocation = Location(it)
+
+            val intent = Intent(locationChangeAction)
+            intent.putExtra(Constants.resultCode, Activity.RESULT_OK)
+            intent.putExtra(Constants.provider, lastLocation.provider)
+            intent.putExtra(Constants.altitude, lastLocation.altitude)
+            intent.putExtra(Constants.latitude, lastLocation.latitude)
+            intent.putExtra(Constants.longitude, lastLocation.longitude)
+
+            val activity = getCurrentActivity()
+            activity?.let {
+                if (activity.in_progress == 1) {
+                    val currentTime = Formatter.currentDateTimeYMDAsString()
+                    val routeId = activity.user_route_id
+                    val path = DbRoutePath(null, routeId, lastLocation.latitude, lastLocation.longitude, currentTime)
+                    database.routePathDao().insert(path)
+                }
+            }
+
+            val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+            broadcastManager.sendBroadcast(intent)
+        }
     }
 }
