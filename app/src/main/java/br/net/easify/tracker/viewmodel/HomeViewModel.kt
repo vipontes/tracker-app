@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -18,10 +19,7 @@ import br.net.easify.tracker.database.model.DbActivity
 import br.net.easify.tracker.database.model.DbRoute
 import br.net.easify.tracker.database.model.DbRoutePath
 import br.net.easify.tracker.enums.TrackerActivityState
-import br.net.easify.tracker.helpers.Constants
-import br.net.easify.tracker.helpers.Formatter
-import br.net.easify.tracker.helpers.ServiceHelper
-import br.net.easify.tracker.helpers.SharedPreferencesHelper
+import br.net.easify.tracker.helpers.*
 import io.reactivex.disposables.CompositeDisposable
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
@@ -63,7 +61,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     val elapsedTime = intent.getLongExtra(Constants.elapsedTime, 0)
                     val displayData = Formatter.hmsTimeFormatter(elapsedTime)
                     displayData?.let {
+                        var path = database.routePathDao().getPathFromRoute(activity.user_route_id)
+
+                        val rhythm = TrackerHelper.calculateAverageRhythmInMinPerKm(path)
+                        val formatedRhythm = Formatter.decimalFormatter(rhythm)
+
                         activity.duration = displayData
+                        activity.rhythm = formatedRhythm
                         trackerActivity.value = activity
                         database.activityDao().update(activity)
                     }

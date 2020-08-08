@@ -1,5 +1,7 @@
 package br.net.easify.tracker.helpers
 
+import android.annotation.SuppressLint
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -22,6 +24,12 @@ class Formatter {
             return simpleDateFormat.format(currentDate())
         }
 
+        fun decimalFormatter(value: Double): String {
+            val dec = DecimalFormat("#.#")
+            return dec.format(value)
+        }
+
+        @SuppressLint("DefaultLocale")
         fun hmsTimeFormatter(milliSeconds: Long): String? {
             return java.lang.String.format(
                 "%02d:%02d:%02d",

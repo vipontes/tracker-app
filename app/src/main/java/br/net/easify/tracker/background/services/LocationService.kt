@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -22,6 +23,7 @@ import br.net.easify.tracker.helpers.Formatter
 import br.net.easify.tracker.helpers.SharedPreferencesHelper
 import br.net.easify.tracker.view.main.MainActivity
 import javax.inject.Inject
+
 
 class LocationService : Service(), LocationListener {
 
@@ -53,17 +55,31 @@ class LocationService : Service(), LocationListener {
         (application as MainApplication).getAppComponent()?.inject(this)
         locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
+        val criteria = Criteria()
+        criteria.accuracy = Criteria.ACCURACY_FINE
+        criteria.isCostAllowed = true
+        criteria.powerRequirement = Criteria.POWER_LOW
+        criteria.isAltitudeRequired = false
+        criteria.isBearingRequired = false
+
         try {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, defaultLocationInterval, defaultLocationDistance, this)
+            locationManager.requestLocationUpdates(defaultLocationInterval, defaultLocationDistance, criteria, this, null)
         } catch (ex: SecurityException) {
         } catch (ex: IllegalArgumentException) {
         }
 
-        try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, defaultLocationInterval, defaultLocationDistance, this)
-        } catch (ex: SecurityException) {
-        } catch (ex: IllegalArgumentException) {
-        }
+
+//        try {
+//            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, defaultLocationInterval, defaultLocationDistance, this)
+//        } catch (ex: SecurityException) {
+//        } catch (ex: IllegalArgumentException) {
+//        }
+
+//        try {
+//            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, defaultLocationInterval, defaultLocationDistance, this)
+//        } catch (ex: SecurityException) {
+//        } catch (ex: IllegalArgumentException) {
+//        }
     }
 
     override fun onDestroy() {
@@ -99,16 +115,8 @@ class LocationService : Service(), LocationListener {
 
             lastLocation = Location(it)
 
-            val intent = Intent(locationChangeAction)
-            intent.putExtra(Constants.resultCode, Activity.RESULT_OK)
-            intent.putExtra(Constants.provider, it.provider)
-            intent.putExtra(Constants.altitude, it.altitude)
-            intent.putExtra(Constants.latitude, it.latitude)
-            intent.putExtra(Constants.longitude, it.longitude)
-
             if (previousLocation == null ||
-                (previousLocation != null &&
-                it.latitude != previousLocation.latitude &&
+                (it.latitude != previousLocation.latitude &&
                 it.longitude != previousLocation.longitude)
             ) {
                 val activity = getCurrentActivity()
@@ -121,10 +129,21 @@ class LocationService : Service(), LocationListener {
                     }
                 }
 
-                val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
-                broadcastManager.sendBroadcast(intent)
+                sendBroadcastData(it)
             }
         }
+    }
+
+    private fun sendBroadcastData(location: Location) {
+        val intent = Intent(locationChangeAction)
+        intent.putExtra(Constants.resultCode, Activity.RESULT_OK)
+        intent.putExtra(Constants.provider, location.provider)
+        intent.putExtra(Constants.altitude, location.altitude)
+        intent.putExtra(Constants.latitude, location.latitude)
+        intent.putExtra(Constants.longitude, location.longitude)
+
+        val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+        broadcastManager.sendBroadcast(intent)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}

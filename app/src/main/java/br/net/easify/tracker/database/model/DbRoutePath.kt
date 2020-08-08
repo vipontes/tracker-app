@@ -1,9 +1,10 @@
 package br.net.easify.tracker.database.model
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "user_route_path")
+@Entity(tableName = "user_route_path", indices=[Index(value = ["user_route_path_datetime"], unique = true)])
 data class DbRoutePath(
 
     @PrimaryKey(autoGenerate = true)
