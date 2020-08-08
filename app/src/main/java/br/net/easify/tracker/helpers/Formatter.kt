@@ -25,15 +25,24 @@ class Formatter {
         }
 
         fun decimalFormatter(value: Double): String {
-            val dec = DecimalFormat("#.#")
+            val dec = DecimalFormat("#.##")
             return dec.format(value)
         }
 
         @SuppressLint("DefaultLocale")
-        fun hmsTimeFormatter(milliSeconds: Long): String? {
+        fun hmsTimeFormatter(milliSeconds: Long): String {
             return java.lang.String.format(
                 "%02d:%02d:%02d",
                 TimeUnit.MILLISECONDS.toHours(milliSeconds),
+                TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
+                TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds))
+            )
+        }
+
+        @SuppressLint("DefaultLocale")
+        fun msTimeFormatter(milliSeconds: Long): String {
+            return java.lang.String.format(
+                "%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
                 TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds))
             )
