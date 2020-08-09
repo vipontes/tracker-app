@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -64,11 +63,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
                     val rhythm = TrackerHelper.calculateAverageRhythmInMiliseconds(path)
                     val formattedRhythm = Formatter.msTimeFormatter(rhythm.toLong())
-                    val distance = TrackerHelper.calculateDistanceInMeters(path)
+                    val distance = TrackerHelper.calculateDistanceInKilometers(path)
+                    val calories = TrackerHelper.calculateCalories(105.0, path)
+                    val speed = TrackerHelper.calculateAverageSpeedInKmPerHour(path)
 
                     activity.duration = displayData
                     activity.rhythm = formattedRhythm
-                    activity.distance = Formatter.decimalFormatter(distance)
+                    activity.distance = Formatter.decimalFormatterTwoDigits(distance)
+                    activity.calories = Formatter.decimalFormatterOneDigit(calories)
+                    activity.speed = Formatter.decimalFormatterOneDigit(speed)
 
                     trackerActivity.value = activity
                     database.activityDao().update(activity)
@@ -94,6 +97,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             getApplication<Application>().resources.getString(R.string.default_distance),
             getApplication<Application>().resources.getString(R.string.default_calories),
             getApplication<Application>().resources.getString(R.string.default_rhythm),
+            getApplication<Application>().resources.getString(R.string.default_speed),
             0,
             0,
             "",
@@ -192,6 +196,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         getApplication<Application>().resources.getString(R.string.default_distance),
                         getApplication<Application>().resources.getString(R.string.default_calories),
                         getApplication<Application>().resources.getString(R.string.default_rhythm),
+                        getApplication<Application>().resources.getString(R.string.default_speed),
                         1,
                         0,
                         databaseFieldTime,

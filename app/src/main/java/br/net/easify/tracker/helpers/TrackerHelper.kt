@@ -11,7 +11,7 @@ class TrackerHelper {
         fun calculateAverageRhythmInMiliseconds(path: List<DbRoutePath>): Double {
             val averageSpeed = calculateAverageSpeedInKmPerHour(path)
             if (averageSpeed == 0.0) return 0.0
-            return (1 / averageSpeed) * 60 * 60 * 1000
+            return (1 / (averageSpeed / 60)) * 1000
         }
 
         fun calculateAverageSpeedInKmPerHour(path: List<DbRoutePath>): Double {
@@ -31,12 +31,27 @@ class TrackerHelper {
             return convertMetersPerSecondsIntoKilometerPerHour(averageSpeedInMetersPerSeconds)
         }
 
+        fun calculateCalories(weigth: Double, path: List<DbRoutePath>): Double {
+
+            val speed = calculateAverageSpeedInKmPerHour(path)
+
+            val totalTime = calculateElapsedTimeInSeconds(
+                path.first().user_route_path_datetime,
+                path.last().user_route_path_datetime
+            )
+
+            return weigth * speed * (totalTime / (60 * 60))
+        }
+
+        fun calculateDistanceInKilometers(path: List<DbRoutePath>): Double {
+            return calculateDistanceInMeters(path) / 1000
+        }
+
         fun calculateDistanceInMeters(path: List<DbRoutePath>): Double {
 
             if (path.size < 2)
                 return 0.0
-
-
+            
             var lastLatitude = 0.0
             var lastLongitude = 0.0
             var totalDistance = 0.0
@@ -57,6 +72,14 @@ class TrackerHelper {
             }
 
             return totalDistance
+        }
+
+        private fun calculateElapsedTimeInHour(startDate: String, endDate: String): Double {
+
+            val startTime: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate)
+            val endTime: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate)
+
+            return ((endTime.time - startTime.time) / 1000.0) / (60 * 60)
         }
 
         private fun calculateElapsedTimeInSeconds(startDate: String, endDate: String): Double {

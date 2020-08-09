@@ -24,8 +24,13 @@ class Formatter {
             return simpleDateFormat.format(currentDate())
         }
 
-        fun decimalFormatter(value: Double): String {
+        fun decimalFormatterTwoDigits(value: Double): String {
             val dec = DecimalFormat("#.##")
+            return dec.format(value)
+        }
+
+        fun decimalFormatterOneDigit(value: Double): String {
+            val dec = DecimalFormat("#.#")
             return dec.format(value)
         }
 
@@ -43,7 +48,7 @@ class Formatter {
         fun msTimeFormatter(milliSeconds: Long): String {
             return java.lang.String.format(
                 "%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
+                TimeUnit.MILLISECONDS.toMinutes(milliSeconds),
                 TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds))
             )
         }

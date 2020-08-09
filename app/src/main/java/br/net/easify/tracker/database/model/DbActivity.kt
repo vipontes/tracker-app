@@ -13,6 +13,7 @@ data class DbActivity(
     var distance: String,
     var calories: String,
     var rhythm: String,
+    var speed: String,
     var in_progress: Int,
     var sync: Int,
     var started_at: String,

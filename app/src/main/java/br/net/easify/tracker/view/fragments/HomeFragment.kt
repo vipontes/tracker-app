@@ -107,6 +107,7 @@ class HomeFragment : Fragment() {
             requireContext().getString(R.string.default_distance),
             requireContext().getString(R.string.default_calories),
             requireContext().getString(R.string.default_rhythm),
+            requireContext().getString(R.string.default_speed),
             0,
             0,
             "",
