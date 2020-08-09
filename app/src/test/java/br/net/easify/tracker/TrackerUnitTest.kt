@@ -54,7 +54,7 @@ class TrackerUnitTest {
                 "2020-08-08 10:26:30")
         )
 
-        var rhythm = TrackerHelper.calculateAverageRhythmInMiliseconds(path)
+        var rhythm = TrackerHelper.calculateAverageRhythmInMilisecondsPerKilometer(path)
         assertEquals(0.0, rhythm, 0.001 )
 
         path.add(
@@ -66,7 +66,13 @@ class TrackerUnitTest {
                 "2020-08-08 10:26:49")
         )
 
-        rhythm = TrackerHelper.calculateAverageRhythmInMiliseconds(path)
+        rhythm = TrackerHelper.calculateAverageRhythmInMilisecondsPerKilometer(path)
         assert(rhythm > 0)
+    }
+
+    @Test
+    fun checkConvertionFromKmPerHourToMinutesPerKm() {
+        val rhythm = TrackerHelper.calculateRhythmInMinutesPerKm(10.0)
+        assertEquals(6.0, rhythm, 0.001)
     }
 }

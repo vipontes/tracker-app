@@ -8,10 +8,14 @@ import kotlin.math.sqrt
 class TrackerHelper {
     companion object {
 
-        fun calculateAverageRhythmInMiliseconds(path: List<DbRoutePath>): Double {
+        fun calculateAverageRhythmInMilisecondsPerKilometer(path: List<DbRoutePath>): Double {
             val averageSpeed = calculateAverageSpeedInKmPerHour(path)
+            return calculateRhythmInMinutesPerKm(averageSpeed) * 60 * 1000
+        }
+
+        fun calculateRhythmInMinutesPerKm(averageSpeed: Double): Double {
             if (averageSpeed == 0.0) return 0.0
-            return (1 / (averageSpeed / 60)) * 1000
+            return (1 / (averageSpeed / 60))
         }
 
         fun calculateAverageSpeedInKmPerHour(path: List<DbRoutePath>): Double {
@@ -40,7 +44,9 @@ class TrackerHelper {
                 path.last().user_route_path_datetime
             )
 
-            return weigth * speed * (totalTime / (60 * 60))
+            val caloriesPerMinute = weigth * speed * 0.0175
+
+            return caloriesPerMinute * (totalTime / 60)
         }
 
         fun calculateDistanceInKilometers(path: List<DbRoutePath>): Double {
