@@ -59,12 +59,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 activity?.let {
                     val elapsedTime = intent.getLongExtra(Constants.elapsedTime, 0)
                     val displayData = Formatter.hmsTimeFormatter(elapsedTime)
-                    var path = database.routePathDao().getPathFromRoute(activity.user_route_id)
+                    val path = database.routePathDao().getPathFromRoute(activity.user_route_id)
+                    val loggedUser = database.userDao().getLoggedUser()
+                    var userWeight = Constants.defaultWeight
+                    loggedUser?.let {
+                        userWeight = it.user_weight
+                    }
 
                     val rhythm = TrackerHelper.calculateAverageRhythmInMilisecondsPerKilometer(path)
                     val formattedRhythm = Formatter.msTimeFormatter(rhythm.toLong())
                     val distance = TrackerHelper.calculateDistanceInKilometers(path)
-                    val calories = TrackerHelper.calculateCalories(105.0, path)
+                    val calories = TrackerHelper.calculateCalories(userWeight, path)
                     val speed = TrackerHelper.calculateAverageSpeedInKmPerHour(path)
 
                     activity.duration = displayData

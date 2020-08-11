@@ -95,6 +95,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             user.userAvatar,
             user.userActive,
             user.userCreatedAt,
+            user.userWeight,
             user.token,
             user.refreshToken
         )

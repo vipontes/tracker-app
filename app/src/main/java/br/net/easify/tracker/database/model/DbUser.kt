@@ -14,6 +14,7 @@ data class DbUser(
     var user_avatar: String?,
     var user_active: Int,
     var user_created_at: String,
+    var user_weight: Int,
     var token: String,
     var refresh_token: String
 )

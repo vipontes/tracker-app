@@ -1,13 +1,14 @@
 package br.net.easify.tracker.model
 
-data class User (
-    var userId : Long,
-    var userName : String,
-    var userEmail : String,
-    var userPassword : String,
-    var userActive : Int,
-    var userAvatar : String?,
-    var userCreatedAt : String,
-    var token : String,
-    var refreshToken : String
+data class User(
+    var userId: Long,
+    var userName: String,
+    var userEmail: String,
+    var userPassword: String,
+    var userActive: Int,
+    var userAvatar: String?,
+    var userCreatedAt: String,
+    var userWeight: Int,
+    var token: String,
+    var refreshToken: String
 )

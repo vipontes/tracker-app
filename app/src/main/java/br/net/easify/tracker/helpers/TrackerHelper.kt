@@ -35,7 +35,7 @@ class TrackerHelper {
             return convertMetersPerSecondsIntoKilometerPerHour(averageSpeedInMetersPerSeconds)
         }
 
-        fun calculateCalories(weigth: Double, path: List<DbRoutePath>): Double {
+        fun calculateCalories(weigth: Int, path: List<DbRoutePath>): Double {
 
             val speed = calculateAverageSpeedInKmPerHour(path)
 

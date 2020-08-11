@@ -7,13 +7,12 @@ import org.junit.Test
 import org.junit.Assert.*
 
 
-
 class TrackerUnitTest {
 
     @Test
-    fun check_speed_calculation() {
+    fun testSpeedCalculation() {
 
-        var path = arrayListOf<DbRoutePath>()
+        val path = arrayListOf<DbRoutePath>()
 
         path.add(
             DbRoutePath(
@@ -40,10 +39,11 @@ class TrackerUnitTest {
         assert(speed > 0)
     }
 
-    @Test
-    fun check_rhythm_calculation() {
 
-        var path = arrayListOf<DbRoutePath>()
+    @Test
+    fun testRhythmCalculation() {
+
+        val path = arrayListOf<DbRoutePath>()
 
         path.add(
             DbRoutePath(
@@ -71,7 +71,7 @@ class TrackerUnitTest {
     }
 
     @Test
-    fun checkConvertionFromKmPerHourToMinutesPerKm() {
+    fun testConversionFromKmPerHourToMinutesPerKm() {
         val rhythm = TrackerHelper.calculateRhythmInMinutesPerKm(10.0)
         assertEquals(6.0, rhythm, 0.001)
     }
