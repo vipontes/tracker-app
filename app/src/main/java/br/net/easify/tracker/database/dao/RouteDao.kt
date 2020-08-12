@@ -7,7 +7,7 @@ import br.net.easify.tracker.database.model.DbRoute
 interface RouteDao {
 
     @Query("SELECT * FROM user_route WHERE user_route_id = :userRouteId")
-    fun getRoute(userRouteId: Long?): DbRoute?
+    fun getRoute(userRouteId: Long): DbRoute?
 
     @Query("SELECT * FROM user_route ORDER BY user_route_id DESC")
     fun getAll(): List<DbRoute>?

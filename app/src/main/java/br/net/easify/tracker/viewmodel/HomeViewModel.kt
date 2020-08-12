@@ -227,20 +227,34 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun stopTracker() {
-
         val activity = getCurrentActivity()
         activity?.let {
-
-            activity.in_progress = 0
-            database.activityDao().update(activity)
-
-            prefs.removeCurrentActivity()
-
-            trackerActivityState.value = TrackerActivityState.idle
-
-            trackerActivity.value = activity
-
+            val stopDatetime = Formatter.currentDateTimeDMYAsString();
+            finishTrackerActivity(activity, stopDatetime)
+            finishUserRoute(activity, stopDatetime)
+            sendNotificationToHomeFragment(activity)
             stopTimerService()
+        }
+    }
+
+    private fun sendNotificationToHomeFragment(activity: DbActivity?) {
+        prefs.removeCurrentActivity()
+        trackerActivityState.value = TrackerActivityState.idle
+        trackerActivity.value = activity
+    }
+
+    private fun finishTrackerActivity(activity: DbActivity, stopDatetime: String) {
+        activity.in_progress = 0
+        activity.finished_at = stopDatetime
+        database.activityDao().update(activity)
+    }
+
+    private fun finishUserRoute(activity: DbActivity, stopDatetime: String) {
+        val routeId = activity.user_route_id
+        var route = database.routeDao().getRoute(routeId)
+        route?.let {
+            it.user_route_end_time = stopDatetime
+            database.routeDao().update(it)
         }
     }
 
