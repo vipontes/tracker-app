@@ -90,10 +90,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
 
         val locationIntent = IntentFilter(LocationService.locationChangeAction)
-        LocalBroadcastManager.getInstance(getApplication()).registerReceiver(onLocationServiceNotification, locationIntent)
+        LocalBroadcastManager.getInstance(getApplication())
+            .registerReceiver(onLocationServiceNotification, locationIntent)
 
         val timerIntent = IntentFilter(TimerService.timerServiceElapsedTimeChanged)
-        LocalBroadcastManager.getInstance(getApplication()).registerReceiver(onTimerServiceNotification, timerIntent)
+        LocalBroadcastManager.getInstance(getApplication())
+            .registerReceiver(onTimerServiceNotification, timerIntent)
 
         trackerActivity.value = DbActivity(
             0,
@@ -251,7 +253,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun finishUserRoute(activity: DbActivity, stopDatetime: String) {
         val routeId = activity.user_route_id
-        var route = database.routeDao().getRoute(routeId)
+        val route = database.routeDao().getRoute(routeId)
         route?.let {
             it.user_route_end_time = stopDatetime
             database.routeDao().update(it)
@@ -270,7 +272,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        var activity = database.activityDao().getActivity(activityId)
+        val activity = database.activityDao().getActivity(activityId)
         activity?.let {
             return it
         }
@@ -279,7 +281,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getCurrentTrackerPath() : ArrayList<GeoPoint> {
-        var path: ArrayList<GeoPoint> = arrayListOf()
+        val path: ArrayList<GeoPoint> = arrayListOf()
 
         val activity = getCurrentActivity()
         activity?.let {

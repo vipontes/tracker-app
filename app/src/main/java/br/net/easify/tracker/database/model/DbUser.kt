@@ -8,13 +8,13 @@ data class DbUser(
 
     @PrimaryKey
     var user_Id: Long?,
-    var user_name: String,
-    var user_email: String,
-    var user_password: String,
+    var user_name: String?,
+    var user_email: String?,
+    var user_password: String?,
     var user_avatar: String?,
     var user_active: Int,
-    var user_created_at: String,
+    var user_created_at: String?,
     var user_weight: Int,
-    var token: String,
-    var refresh_token: String
+    var token: String?,
+    var refresh_token: String?
 )
