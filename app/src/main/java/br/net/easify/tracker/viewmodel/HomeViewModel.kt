@@ -32,11 +32,10 @@ import javax.inject.Inject
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val disposable = CompositeDisposable()
 
-    val errorMessage by lazy { MutableLiveData<String>() }
     val trackerActivityState by lazy { MutableLiveData<TrackerActivityState>() }
     val currentLocation by lazy { MutableLiveData<GeoPoint>() }
     val trackerActivity by lazy { MutableLiveData<DbActivity>() }
-    val errorResponse by lazy { MutableLiveData<ErrorResponse>() }
+    val toastMessage by lazy { MutableLiveData<Response>() }
 
     private var routeService = RouteService(application)
 
@@ -230,8 +229,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
                     startTimerService()
                 } else {
-                    // Report error
-                    errorMessage.value = "Could not start activity."
+                    toastMessage.value =
+                        Response((getApplication() as MainApplication).getString(R.string.start_activity_error))
                 }
             }
         }
@@ -240,12 +239,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun stopTracker() {
         val activity = getCurrentActivity()
         activity?.let {
-            val stopDatetime = Formatter.currentDateTimeDMYAsString();
+            val stopDatetime = Formatter.currentDateTimeYMDAsString();
             finishTrackerActivity(activity, stopDatetime)
-            finishUserRoute(activity, stopDatetime)
-            sendNotificationToHomeFragment(activity)
-            stopTimerService()
-            synchronizeTrackingActivity(activity)
+            if ( finishUserRoute(activity, stopDatetime) ) {
+                sendNotificationToHomeFragment(activity)
+                stopTimerService()
+                synchronizeTrackingActivity(activity)
+            } else {
+                toastMessage.value =
+                    Response((getApplication() as MainApplication).getString(R.string.stopping_tracking_error))
+            }
         }
     }
 
@@ -260,7 +263,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableSingleObserver<Route>() {
                     override fun onSuccess(res: Route) {
-
+                        toastMessage.value =
+                            Response((getApplication() as MainApplication).getString(R.string.tracking_successfully_saved))
                     }
 
                     override fun onError(e: Throwable) {
@@ -268,15 +272,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
                         if (e is HttpException) {
                             if (e.code() == 401) {
-                                errorResponse.value =
-                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.unauthorized))
+                                toastMessage.value =
+                                    Response((getApplication() as MainApplication).getString(R.string.unauthorized))
                             } else {
-                                errorResponse.value =
-                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                                toastMessage.value =
+                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
                             }
                         } else {
-                            errorResponse.value =
-                                ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                            toastMessage.value =
+                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
                         }
                     }
                 })
@@ -321,13 +325,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         database.activityDao().update(activity)
     }
 
-    private fun finishUserRoute(activity: DbActivity, stopDatetime: String) {
+    private fun finishUserRoute(activity: DbActivity, stopDatetime: String): Boolean {
         val routeId = activity.user_route_id
         val route = database.routeDao().getRoute(routeId)
         route?.let {
             it.user_route_end_time = stopDatetime
-            database.routeDao().update(it)
+            return database.routeDao().update(it) > 0
         }
+
+        return false
     }
 
     fun getTrackerState(): TrackerActivityState? {

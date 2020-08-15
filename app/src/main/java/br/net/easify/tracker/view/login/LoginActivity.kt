@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.model.DbToken
 import br.net.easify.tracker.databinding.ActivityLoginBinding
-import br.net.easify.tracker.model.ErrorResponse
+import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.model.User
@@ -23,6 +23,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -37,9 +38,11 @@ class LoginActivity : AppCompatActivity() {
         viewModel.getUserFromToken()
     }
 
-    private val errorMessageObserver = Observer<ErrorResponse> { error: ErrorResponse ->
+    private val errorMessageObserver = Observer<Response> { error: Response ->
         error.let {
             Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+            dataBinding.spinner.visibility = View.GONE
+            dataBinding.loginButton.visibility = View.VISIBLE
         }
     }
 
@@ -101,6 +104,8 @@ class LoginActivity : AppCompatActivity() {
 
         dataBinding.loginButton.setOnClickListener(View.OnClickListener {
             if ( viewModel.validate() ) {
+                dataBinding.spinner.visibility = View.VISIBLE
+                dataBinding.loginButton.visibility = View.GONE
                 viewModel.login()
             }
         })

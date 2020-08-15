@@ -17,6 +17,7 @@ import br.net.easify.tracker.database.model.DbActivity
 import br.net.easify.tracker.databinding.FragmentHomeBinding
 import br.net.easify.tracker.enums.TrackerActivityState
 import br.net.easify.tracker.helpers.CustomAlertDialog
+import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.viewmodel.HomeViewModel
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -24,7 +25,6 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapController
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class HomeFragment : Fragment() {
 
@@ -68,8 +68,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private val errorMessageObserver = Observer<String> {
-        Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+    private val toastMessageObserver = Observer<Response> {
+        Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
     }
 
     private val trackerActivityObserver = Observer<DbActivity> {
@@ -87,7 +87,7 @@ class HomeFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         viewModel.trackerActivityState.observe(viewLifecycleOwner, trackerActivityStateObserver)
         viewModel.currentLocation.observe(viewLifecycleOwner, currentLocationObserver)
-        viewModel.errorMessage.observe(viewLifecycleOwner, errorMessageObserver)
+        viewModel.toastMessage.observe(viewLifecycleOwner, toastMessageObserver)
         viewModel.trackerActivity.observe(viewLifecycleOwner, trackerActivityObserver)
 
         return dataBinding.root;

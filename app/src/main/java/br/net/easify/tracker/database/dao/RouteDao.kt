@@ -19,5 +19,5 @@ interface RouteDao {
     fun delete(userRouteId: Long)
 
     @Update
-    fun update(dbRoute: DbRoute)
+    fun update(dbRoute: DbRoute): Int
 }

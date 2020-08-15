@@ -1,7 +1,6 @@
 package br.net.easify.tracker.viewmodel
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.MainApplication
@@ -9,7 +8,7 @@ import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
 import br.net.easify.tracker.database.model.DbToken
 import br.net.easify.tracker.database.model.DbUser
-import br.net.easify.tracker.model.ErrorResponse
+import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.model.User
@@ -29,7 +28,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     val tokens by lazy { MutableLiveData<Token>() }
     val loggedUser by lazy { MutableLiveData<User>() }
-    val errorResponse by lazy { MutableLiveData<ErrorResponse>() }
+    val errorResponse by lazy { MutableLiveData<Response>() }
     val loginBody by lazy { MutableLiveData<LoginBody>() }
 
     private var loginService = LoginService()
@@ -68,14 +67,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         if (e is HttpException) {
                             if (e.code() == 401) {
                                 errorResponse.value =
-                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.unauthorized))
+                                    Response((getApplication() as MainApplication).getString(R.string.unauthorized))
                             } else {
                                 errorResponse.value =
-                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
                             }
                         } else {
                             errorResponse.value =
-                                ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
                         }
                     }
                 })
@@ -132,14 +131,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                                 if (e is HttpException) {
                                     if (e.code() == 401) {
                                         errorResponse.value =
-                                            ErrorResponse((getApplication() as MainApplication).getString(R.string.unauthorized))
+                                            Response((getApplication() as MainApplication).getString(R.string.unauthorized))
                                     } else {
                                         errorResponse.value =
-                                            ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                                            Response((getApplication() as MainApplication).getString(R.string.internal_error))
                                     }
                                 } else {
                                     errorResponse.value =
-                                        ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                                        Response((getApplication() as MainApplication).getString(R.string.internal_error))
                                 }
                             }
                         })
@@ -155,12 +154,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             val password = it?.user_password
 
             if (email.isNullOrEmpty()) {
-                errorResponse.value = ErrorResponse((getApplication() as MainApplication).getString(R.string.empty_email))
+                errorResponse.value = Response((getApplication() as MainApplication).getString(R.string.empty_email))
                 return false
             }
 
             if (password.isNullOrEmpty()) {
-                errorResponse.value = ErrorResponse((getApplication() as MainApplication).getString(R.string.empty_password))
+                errorResponse.value = Response((getApplication() as MainApplication).getString(R.string.empty_password))
                 return false
             }
 

@@ -1,6 +1,6 @@
 package br.net.easify.tracker.model
 
-class ErrorResponse {
+class Response {
     var message: String
 
     constructor(message: String) {
