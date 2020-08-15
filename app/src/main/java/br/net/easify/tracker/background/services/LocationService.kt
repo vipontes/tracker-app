@@ -124,7 +124,7 @@ class LocationService : Service(), LocationListener {
                     if (value.in_progress == 1) {
                         val currentTime = Formatter.currentDateTimeYMDAsString()
                         val routeId = value.user_route_id
-                        val path = DbRoutePath(null, routeId, it.latitude, it.longitude, currentTime)
+                        val path = DbRoutePath(null, routeId, it.latitude, it.longitude, it.altitude, currentTime)
                         database.routePathDao().insert(path)
                     }
                 }

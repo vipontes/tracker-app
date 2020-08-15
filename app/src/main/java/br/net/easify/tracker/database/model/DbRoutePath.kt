@@ -12,5 +12,6 @@ data class DbRoutePath(
     var user_route_id: Long,
     var user_route_path_lat: Double,
     var user_route_path_lng: Double,
+    var user_route_path_altitude: Double,
     var user_route_path_datetime: String
 )

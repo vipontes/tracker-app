@@ -33,7 +33,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val loginBody by lazy { MutableLiveData<LoginBody>() }
 
     private var loginService = LoginService()
-    private var userService = UserService()
+    private var userService = UserService(application)
 
     @Inject
     lateinit var database: AppDatabase
@@ -43,15 +43,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         loginBody.value = LoginBody("", "")
     }
 
-    fun login(context: Context) {
+    fun login() {
         loginBody.value.let {
             val email = it?.user_email.toString()
             val password = it?.user_password.toString()
-            checkLogin(context, email, password)
+            checkLogin(email, password)
         }
     }
 
-    private fun checkLogin(context: Context, email: String, password: String) {
+    private fun checkLogin(email: String, password: String) {
 
         disposable.add(
             loginService.login(email, password)
@@ -67,13 +67,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                         if (e is HttpException) {
                             if (e.code() == 401) {
-                                ErrorResponse(context.getString(R.string.unauthorized))
+                                errorResponse.value =
+                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.unauthorized))
                             } else {
-                                ErrorResponse(context.getString(R.string.internal_error))
+                                errorResponse.value =
+                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
                             }
                         } else {
                             errorResponse.value =
-                                ErrorResponse(context.getString(R.string.internal_error))
+                                ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
                         }
                     }
                 })
@@ -108,15 +110,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         return database.userDao().getLoggedUser()
     }
 
-    fun getUserFromToken(context: Context) {
+    fun getUserFromToken() {
 
         val dbToken = database.tokenDao().get()
         dbToken?.let { tokens: DbToken ->
             val jwt = JWT(tokens.token)
             val userId = jwt.getClaim("userId").asInt()
-
-            userService.setTokens(dbToken)
-
             userId?.let { id: Int ->
                 disposable.add(
                     userService.getUser(id)
@@ -132,13 +131,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                                 if (e is HttpException) {
                                     if (e.code() == 401) {
-                                        ErrorResponse(context.getString(R.string.unauthorized))
+                                        errorResponse.value =
+                                            ErrorResponse((getApplication() as MainApplication).getString(R.string.unauthorized))
                                     } else {
-                                        ErrorResponse(context.getString(R.string.internal_error))
+                                        errorResponse.value =
+                                            ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
                                     }
                                 } else {
                                     errorResponse.value =
-                                        ErrorResponse(context.getString(R.string.internal_error))
+                                        ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
                                 }
                             }
                         })
@@ -147,19 +148,19 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun validate(context: Context): Boolean {
+    fun validate(): Boolean {
 
         loginBody.value.let {
             val email = it?.user_email
             val password = it?.user_password
 
             if (email.isNullOrEmpty()) {
-                errorResponse.value = ErrorResponse(context.getString(R.string.empty_email))
+                errorResponse.value = ErrorResponse((getApplication() as MainApplication).getString(R.string.empty_email))
                 return false
             }
 
             if (password.isNullOrEmpty()) {
-                errorResponse.value = ErrorResponse(context.getString(R.string.empty_password))
+                errorResponse.value = ErrorResponse((getApplication() as MainApplication).getString(R.string.empty_password))
                 return false
             }
 

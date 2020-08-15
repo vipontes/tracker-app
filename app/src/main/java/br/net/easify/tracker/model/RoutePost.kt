@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 data class RoutePost (
 
     @SerializedName("user_id")
-    var userId: Int,
+    var userId: Long,
 
     @SerializedName("user_route_description")
     var userRouteDescription: String?,
@@ -22,7 +22,7 @@ data class RoutePost (
     val path: List<RoutePathPost>?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readInt(),
+        parcel.readLong(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
@@ -31,7 +31,7 @@ data class RoutePost (
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(userId)
+        parcel.writeLong(userId)
         parcel.writeString(userRouteDescription)
         parcel.writeString(userRouteStartTime)
         parcel.writeString(userRouteEndTime)

@@ -1,6 +1,9 @@
 package br.net.easify.tracker.di.component
 
 import br.net.easify.tracker.MainApplication
+import br.net.easify.tracker.api.RouteService
+import br.net.easify.tracker.api.UserService
+import br.net.easify.tracker.api.interceptor.AuthInterceptor
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.di.module.AppModule
 import br.net.easify.tracker.di.module.DatabaseModule
@@ -25,5 +28,6 @@ interface AppComponent {
     fun inject(viewModel: LoginViewModel)
     fun inject(viewModel: MainViewModel)
     fun inject(viewModel: HomeViewModel)
-    fun inject(service: LocationService)
+    fun inject(locationService: LocationService)
+    fun inject(interceptor: AuthInterceptor)
 }

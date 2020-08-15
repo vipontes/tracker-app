@@ -15,7 +15,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
 import br.net.easify.tracker.database.model.DbActivity
@@ -195,7 +194,7 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                 if (activity.in_progress == 1) {
                     val currentTime = Formatter.currentDateTimeYMDAsString()
                     val routeId = activity.user_route_id
-                    val path = DbRoutePath(null, routeId, lastLocation.latitude, lastLocation.longitude, currentTime)
+                    val path = DbRoutePath(null, routeId, lastLocation.latitude, lastLocation.longitude, lastLocation.altitude, currentTime)
                     database.routePathDao().insert(path)
                 }
             }

@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
+import br.net.easify.tracker.api.RouteService
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.background.services.TimerService
 import br.net.easify.tracker.database.AppDatabase
@@ -19,8 +20,13 @@ import br.net.easify.tracker.database.model.DbRoute
 import br.net.easify.tracker.database.model.DbRoutePath
 import br.net.easify.tracker.enums.TrackerActivityState
 import br.net.easify.tracker.helpers.*
+import br.net.easify.tracker.model.*
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 import org.osmdroid.util.GeoPoint
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -30,6 +36,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val trackerActivityState by lazy { MutableLiveData<TrackerActivityState>() }
     val currentLocation by lazy { MutableLiveData<GeoPoint>() }
     val trackerActivity by lazy { MutableLiveData<DbActivity>() }
+    val errorResponse by lazy { MutableLiveData<ErrorResponse>() }
+
+    private var routeService = RouteService(application)
 
     @Inject
     lateinit var serviceHelper: ServiceHelper
@@ -192,7 +201,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
                 if (routeId > 0) {
                     // 2 - Create a path
-                    val routePath = DbRoutePath(null, routeId, pt.latitude, pt.longitude, databaseFieldTime)
+                    val routePath = DbRoutePath(null, routeId, pt.latitude, pt.longitude, pt.altitude, databaseFieldTime)
                     database.routePathDao().insert(routePath)
 
                     // 3 - Create an activity
@@ -236,7 +245,68 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             finishUserRoute(activity, stopDatetime)
             sendNotificationToHomeFragment(activity)
             stopTimerService()
+            synchronizeTrackingActivity(activity)
         }
+    }
+
+    private fun synchronizeTrackingActivity(activity: DbActivity) {
+        val userId = database.userDao().getLoggedUser()?.user_Id!!
+        val route = database.routeDao().getRoute(activity.user_route_id)!!
+        val data = getRoutePost(route, userId)
+
+        disposable.add(
+            routeService.postRoute(data)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<Route>() {
+                    override fun onSuccess(res: Route) {
+
+                    }
+
+                    override fun onError(e: Throwable) {
+                        e.printStackTrace()
+
+                        if (e is HttpException) {
+                            if (e.code() == 401) {
+                                errorResponse.value =
+                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.unauthorized))
+                            } else {
+                                errorResponse.value =
+                                    ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                            }
+                        } else {
+                            errorResponse.value =
+                                ErrorResponse((getApplication() as MainApplication).getString(R.string.internal_error))
+                        }
+                    }
+                })
+        )
+    }
+
+    private fun getRoutePost(route: DbRoute, userId: Long): RoutePost {
+        val path = database.routePathDao().getPathFromRoute(route.user_route_id!!)!!
+
+        var routePath = arrayListOf<RoutePathPost>()
+
+        for (item in path) {
+            routePath.add(
+                RoutePathPost(
+                    item.user_route_path_lat,
+                    item.user_route_path_lng,
+                    item.user_route_path_altitude,
+                    item.user_route_path_datetime
+                )
+            )
+        }
+
+        val data = RoutePost(
+            userId,
+            route.user_route_description,
+            route.user_route_start_time,
+            route.user_route_end_time,
+            routePath
+        )
+        return data
     }
 
     private fun sendNotificationToHomeFragment(activity: DbActivity?) {

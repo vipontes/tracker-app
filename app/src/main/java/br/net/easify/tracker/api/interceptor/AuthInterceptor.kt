@@ -1,5 +1,8 @@
 package br.net.easify.tracker.api.interceptor
 
+import android.app.Application
+import br.net.easify.tracker.MainApplication
+import br.net.easify.tracker.database.AppDatabase
 import br.net.easify.tracker.database.model.DbToken
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -7,10 +10,15 @@ import okhttp3.Response
 import java.io.IOException
 import javax.inject.Inject
 
-class AuthInterceptor @Inject constructor(private var tokens: DbToken) : Interceptor {
+class AuthInterceptor @Inject constructor(application: Application) : Interceptor {
 
-    fun setTokens(tokens: DbToken) {
-        this.tokens = tokens
+    @Inject
+    lateinit var database: AppDatabase
+
+    private var tokens = DbToken("", "")
+
+    init {
+        (application as MainApplication).getAppComponent()?.inject(this)
     }
 
     @Throws(IOException::class)
@@ -18,17 +26,26 @@ class AuthInterceptor @Inject constructor(private var tokens: DbToken) : Interce
         synchronized(this) {
             val request: Request = chain.request()
 
+            getToken()
+
             val requestBuilder: Request.Builder = request.newBuilder()
 
             if (request.header("No-Authentication") == null) {
-                if (tokens == null) {
+                if (tokens.token.isEmpty()) {
                     throw java.lang.RuntimeException("Token not found")
                 } else {
-                    requestBuilder.addHeader("Authorization", "Bearer ${tokens?.token}")
+                    requestBuilder.addHeader("Authorization", "Bearer ${tokens.token}")
                 }
             }
 
             return chain.proceed(requestBuilder.build())
+        }
+    }
+
+    private fun getToken() {
+        val dbToken = database.tokenDao().get()
+        dbToken?.let {
+            tokens = it
         }
     }
 }

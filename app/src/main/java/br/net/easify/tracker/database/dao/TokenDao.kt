@@ -10,7 +10,7 @@ interface  TokenDao {
     fun get(): DbToken?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(dbToken: DbToken?)
+    fun insert(dbToken: DbToken)
 
     @Query("DELETE FROM token")
     fun delete()

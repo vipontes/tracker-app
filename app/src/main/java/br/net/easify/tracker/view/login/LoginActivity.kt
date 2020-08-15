@@ -34,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
 
         var tokenLocal = DbToken(it.token, it.refreshToken)
         viewModel.saveTokens(tokenLocal)
-        viewModel.getUserFromToken(this)
+        viewModel.getUserFromToken()
     }
 
     private val errorMessageObserver = Observer<ErrorResponse> { error: ErrorResponse ->
@@ -100,8 +100,8 @@ class LoginActivity : AppCompatActivity() {
         viewModel.errorResponse.observe(this, errorMessageObserver)
 
         dataBinding.loginButton.setOnClickListener(View.OnClickListener {
-            if ( viewModel.validate(this) ) {
-                viewModel.login(this)
+            if ( viewModel.validate() ) {
+                viewModel.login()
             }
         })
     }
