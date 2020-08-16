@@ -10,6 +10,11 @@
     <color name="colorScheme4">#a53e24</color>
     <color name="colorScheme5">#a35f3e</color>
 
+    <color name="colorGray">#868686</color>
+    <color name="colorDarkGray">#616161</color>
+
+
+
     <color name="colorWhite">#f5f3ec</color>
     <color name="colorRed">#e8505b</color>
 

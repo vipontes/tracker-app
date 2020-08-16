@@ -104,20 +104,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         LocalBroadcastManager.getInstance(getApplication())
             .registerReceiver(onTimerServiceNotification, timerIntent)
 
-        trackerRoute.value = DbRoute(
-            0,
-            0,
-            getApplication<Application>().resources.getString(R.string.default_duration),
-            getApplication<Application>().resources.getString(R.string.default_distance),
-            getApplication<Application>().resources.getString(R.string.default_calories),
-            getApplication<Application>().resources.getString(R.string.default_rhythm),
-            getApplication<Application>().resources.getString(R.string.default_speed),
-            "",
-            "",
-            null,
-            0,
-            0
-        )
+        trackerRoute.value = createEmptyRoute(0, "", "", 0)
 
         checkRunningActivity()
     }
@@ -194,20 +181,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 val databaseFieldTime = Formatter.currentDateTimeYMDAsString();
                 val description = "Activity $startTime"
 
-                val route = DbRoute(
-                    null,
-                    userId,
-                    getApplication<Application>().resources.getString(R.string.default_duration),
-                    getApplication<Application>().resources.getString(R.string.default_distance),
-                    getApplication<Application>().resources.getString(R.string.default_calories),
-                    getApplication<Application>().resources.getString(R.string.default_rhythm),
-                    getApplication<Application>().resources.getString(R.string.default_speed),
-                    description,
-                    databaseFieldTime,
-                    null,
-                    1,
-                    0
-                )
+                val route = createEmptyRoute(userId, description, databaseFieldTime, 1)
                 val routeId = database.routeDao().insert(route)
 
                 if (routeId > 0) {
@@ -227,15 +201,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun createEmptyRoute(
+        userId: Long,
+        description: String,
+        databaseFieldTime: String,
+        inProgress: Int
+    ): DbRoute {
+        return DbRoute(
+            null,
+            userId,
+            getApplication<Application>().resources.getString(R.string.default_duration),
+            getApplication<Application>().resources.getString(R.string.default_distance),
+            getApplication<Application>().resources.getString(R.string.default_calories),
+            getApplication<Application>().resources.getString(R.string.default_rhythm),
+            getApplication<Application>().resources.getString(R.string.default_speed),
+            description,
+            databaseFieldTime,
+            null,
+            inProgress,
+            0
+        )
+    }
+
     fun stopTracker() {
         val route = getCurrentRoute()
         route?.let {
             val stopDatetime = Formatter.currentDateTimeYMDAsString();
             finishTrackerActivity(route, stopDatetime)
             if ( finishUserRoute(route, stopDatetime) ) {
-                sendNotificationToHomeFragment(route)
                 stopTimerService()
                 synchronizeTrackingActivity(route)
+                sendNotificationToHomeFragment(route)
             } else {
                 toastMessage.value =
                     Response((getApplication() as MainApplication).getString(R.string.stopping_tracking_error))
@@ -255,7 +251,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     override fun onSuccess(res: Route) {
                         route.sync = 1
                         database.routeDao().update(route)
-
                         toastMessage.value =
                             Response((getApplication() as MainApplication).getString(R.string.tracking_successfully_saved))
                     }
@@ -313,7 +308,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun sendNotificationToHomeFragment(route: DbRoute) {
         prefs.removeCurrentRoute()
         trackerActivityState.value = TrackerActivityState.idle
-        trackerRoute.value = route
+        trackerRoute.value = createEmptyRoute(0, "", "", 0)
     }
 
     private fun finishTrackerActivity(route: DbRoute, stopDatetime: String) {
