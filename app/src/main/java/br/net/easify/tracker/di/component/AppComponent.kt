@@ -12,6 +12,7 @@ import br.net.easify.tracker.di.module.ServiceModule
 import br.net.easify.tracker.viewmodel.HomeViewModel
 import br.net.easify.tracker.viewmodel.LoginViewModel
 import br.net.easify.tracker.viewmodel.MainViewModel
+import br.net.easify.tracker.viewmodel.SettingsViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -28,6 +29,7 @@ interface AppComponent {
     fun inject(viewModel: LoginViewModel)
     fun inject(viewModel: MainViewModel)
     fun inject(viewModel: HomeViewModel)
+    fun inject(viewModel: SettingsViewModel)
     fun inject(locationService: LocationService)
     fun inject(interceptor: AuthInterceptor)
 }

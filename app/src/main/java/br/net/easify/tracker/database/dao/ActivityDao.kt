@@ -13,7 +13,7 @@ interface ActivityDao {
     fun insert(activity: DbActivity): Long
 
     @Query("DELETE FROM activity")
-    fun deleteAll()
+    fun delete()
 
     @Update
     fun update(activity: DbActivity)

@@ -90,7 +90,7 @@ class HomeFragment : Fragment() {
         viewModel.toastMessage.observe(viewLifecycleOwner, toastMessageObserver)
         viewModel.trackerActivity.observe(viewLifecycleOwner, trackerActivityObserver)
 
-        return dataBinding.root;
+        return dataBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -122,13 +122,13 @@ class HomeFragment : Fragment() {
                 if (it == TrackerActivityState.idle) {
                     startTrackerActivity()
                 } else {
-                    alertDialog = CustomAlertDialog.show(requireContext(), "Tracker Activity",
-                        "Do you really want to finish your activity?",
-                        "Yes", View.OnClickListener {
+                    alertDialog = CustomAlertDialog.show(requireContext(), getString(R.string.tracker_activity),
+                        getString(R.string.finish_activity_confirmation),
+                        getString(R.string.yes), View.OnClickListener {
                             alertDialog!!.dismiss()
                             stopTrackerActivity()
                         },
-                        "No",
+                        getString(R.string.no),
                         View.OnClickListener { alertDialog!!.dismiss() }
                     )
                 }

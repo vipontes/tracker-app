@@ -290,7 +290,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun getRoutePost(route: DbRoute, userId: Long): RoutePost {
         val path = database.routePathDao().getPathFromRoute(route.user_route_id!!)!!
 
-        var routePath = arrayListOf<RoutePathPost>()
+        val routePath = arrayListOf<RoutePathPost>()
 
         for (item in path) {
             routePath.add(
@@ -303,14 +303,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
 
-        val data = RoutePost(
+        return RoutePost(
             userId,
             route.user_route_description,
             route.user_route_start_time,
             route.user_route_end_time,
             routePath
         )
-        return data
     }
 
     private fun sendNotificationToHomeFragment(activity: DbActivity?) {

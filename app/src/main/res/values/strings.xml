@@ -48,5 +48,12 @@
     <string name="speed">Speed</string>
     <string name="default_speed">0.0</string>
     <string name="speed_unit">(km/h)</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="logout_confirmation">Are you sure to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="finish_activity_confirmation">Do you really want to finish your activity?</string>
+    <string name="tracker_activity">Tracker Activity</string>
+    <string name="logout">Logout</string>
 
 </resources>

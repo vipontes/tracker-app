@@ -14,13 +14,13 @@ class CustomAlertDialog : AlertDialog {
     constructor(context: Context?) : super(context!!) {}
 
     companion object {
-        var mView: View? = null
+        var view: View? = null
         var button: Button? = null
-        var btnNegativo: Button? = null
+        var negativeButton: Button? = null
         var message: TextView? = null
         var title: TextView? = null
         var congratulation_card: CardView? = null
-        var mAlertDialog: AlertDialog? = null
+        var dialog: AlertDialog? = null
         fun getViewOneButton(
             context: Context?,
             titulo: String?,
@@ -29,16 +29,16 @@ class CustomAlertDialog : AlertDialog {
             onClick: View.OnClickListener?,
             colorCard: Int
         ): View? {
-            mView =
+            view =
                 View.inflate(context, R.layout.layout_dialog_msg, null)
             congratulation_card =
-                mView!!.findViewById(R.id.congratulation_card)
+                view!!.findViewById(R.id.congratulation_card)
             button =
-                mView!!.findViewById(R.id.read_btn)
+                view!!.findViewById(R.id.read_btn)
             message =
-                mView!!.findViewById(R.id.message)
+                view!!.findViewById(R.id.message)
             title =
-                mView!!.findViewById(R.id.title)
+                view!!.findViewById(R.id.title)
             title!!.setText(titulo)
             message!!.setText(mensagem)
             button!!.setText(botaoPositivo)
@@ -49,9 +49,9 @@ class CustomAlertDialog : AlertDialog {
                 button!!.setOnClickListener(onClick as View.OnClickListener?)
             } else {
                 button!!.setOnClickListener(
-                    View.OnClickListener { view: View? -> mAlertDialog!!.dismiss() })
+                    View.OnClickListener { view: View? -> dialog!!.dismiss() })
             }
-            return mView
+            return view
         }
 
         fun getViewOneButton(
@@ -61,16 +61,16 @@ class CustomAlertDialog : AlertDialog {
             botaoPositivo: String?,
             onClick: View.OnClickListener?
         ): View? {
-            mView =
+            view =
                 View.inflate(context, R.layout.layout_dialog_msg, null)
             congratulation_card =
-                mView!!.findViewById(R.id.congratulation_card)
+                view!!.findViewById(R.id.congratulation_card)
             button =
-                mView!!.findViewById(R.id.read_btn)
+                view!!.findViewById(R.id.read_btn)
             message =
-                mView!!.findViewById(R.id.message)
+                view!!.findViewById(R.id.message)
             title =
-                mView!!.findViewById(R.id.title)
+                view!!.findViewById(R.id.title)
             title!!.setText(titulo)
             message!!.setText(mensagem)
             button!!.setText(botaoPositivo)
@@ -78,9 +78,9 @@ class CustomAlertDialog : AlertDialog {
                 button!!.setOnClickListener(onClick as View.OnClickListener?)
             } else {
                 button!!.setOnClickListener(
-                    View.OnClickListener { view: View? -> mAlertDialog!!.dismiss() })
+                    View.OnClickListener { view: View? -> dialog!!.dismiss() })
             }
-            return mView
+            return view
         }
 
         fun getViewOneButton(
@@ -91,16 +91,16 @@ class CustomAlertDialog : AlertDialog {
             onClick: View.OnClickListener?,
             colorCard: Int
         ): View? {
-            mView =
+            view =
                 View.inflate(context, R.layout.layout_dialog_msg, null)
             congratulation_card =
-                mView!!.findViewById(R.id.congratulation_card)
+                view!!.findViewById(R.id.congratulation_card)
             button =
-                mView!!.findViewById(R.id.read_btn)
+                view!!.findViewById(R.id.read_btn)
             message =
-                mView!!.findViewById(R.id.message)
+                view!!.findViewById(R.id.message)
             title =
-                mView!!.findViewById(R.id.title)
+                view!!.findViewById(R.id.title)
             if (colorCard != 0) congratulation_card!!.setCardBackgroundColor(
                 colorCard
             )
@@ -111,9 +111,9 @@ class CustomAlertDialog : AlertDialog {
                 button!!.setOnClickListener(onClick as View.OnClickListener?)
             } else {
                 button!!.setOnClickListener(
-                    View.OnClickListener { view: View? -> mAlertDialog!!.dismiss() })
+                    View.OnClickListener { view: View? -> dialog!!.dismiss() })
             }
-            return mView
+            return view
         }
 
         fun getViewTwoButton(
@@ -126,106 +126,85 @@ class CustomAlertDialog : AlertDialog {
             onClickNega: View.OnClickListener?,
             colorCard: Int
         ): View? {
-            mView =
+            view =
                 View.inflate(context, R.layout.layout_dialog_msg_two_button, null)
             congratulation_card =
-                mView!!.findViewById(R.id.congratulation_card)
+                view!!.findViewById(R.id.congratulation_card)
             button =
-                mView!!.findViewById(R.id.btnPositivo)
-            btnNegativo =
-                mView!!.findViewById(R.id.btnNegativo)
+                view!!.findViewById(R.id.btnPositivo)
+            negativeButton =
+                view!!.findViewById(R.id.btnNegativo)
             message =
-                mView!!.findViewById(R.id.message)
+                view!!.findViewById(R.id.message)
             title =
-                mView!!.findViewById(R.id.title)
+                view!!.findViewById(R.id.title)
             if (colorCard != 0) congratulation_card!!.setCardBackgroundColor(
                 colorCard
             )
             title!!.setText(titulo)
             message!!.setText(mensagem)
             button!!.setText(botaoPositivo)
-            btnNegativo!!.setText(botaoNegativo)
+            negativeButton!!.setText(botaoNegativo)
             button!!.setOnClickListener(onClick)
-            btnNegativo!!.setOnClickListener(onClickNega)
-            return mView
+            negativeButton!!.setOnClickListener(onClickNega)
+            return view
         }
 
-        /**
-         * Show simples
-         *
-         * @param context
-         * @param titulo
-         * @param mensagem
-         */
         fun show(
             context: Context?,
-            titulo: String?,
-            mensagem: String?
+            title: String?,
+            message: String?
         ): AlertDialog? {
             val builder =
                 Builder(context!!)
                     .setView(
                         getViewOneButton(
                             context,
-                            titulo,
-                            mensagem,
-                            "Fechar",
+                            title,
+                            message,
+                            "Close",
                             null
                         )
                     )
                     .setCancelable(false)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
 
-        /**
-         * Show simples
-         *
-         * @param context
-         * @param titulo
-         * @param mensagem
-         */
         fun show(
             context: Context?,
-            @StringRes titulo: Int,
-            @StringRes mensagem: Int
+            @StringRes title: Int,
+            @StringRes message: Int
         ): AlertDialog? {
             val builder =
                 Builder(context!!)
                     .setView(
                         getViewOneButton(
                             context,
-                            titulo,
-                            mensagem,
-                            "Fechar",
+                            title,
+                            message,
+                            "Close",
                             null,
                             0
                         )
                     )
                     .setCancelable(false)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
 
-        /**
-         * Show simples
-         *
-         * @param context
-         * @param titulo
-         * @param mensagem
-         */
         fun show(
             context: Context?,
-            @StringRes titulo: Int,
-            @StringRes mensagem: Int,
+            @StringRes title: Int,
+            @StringRes message: Int,
             colorCard: Int
         ): AlertDialog? {
             val builder =
@@ -233,20 +212,20 @@ class CustomAlertDialog : AlertDialog {
                     .setView(
                         getViewOneButton(
                             context,
-                            titulo,
-                            mensagem,
-                            "Fechar",
+                            title,
+                            message,
+                            "Close",
                             null,
                             colorCard
                         )
                     )
                     .setCancelable(false)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
 
         fun show(
@@ -270,12 +249,12 @@ class CustomAlertDialog : AlertDialog {
                         )
                     )
                     .setCancelable(false)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
 
         fun show(
@@ -297,12 +276,12 @@ class CustomAlertDialog : AlertDialog {
                         )
                     )
                     .setCancelable(false)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
 
         fun show(
@@ -325,78 +304,54 @@ class CustomAlertDialog : AlertDialog {
                         )
                     )
                     .setCancelable(cancelable)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog!!.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
 
-        /**
-         * Show com opção
-         *
-         * @param context
-         * @param titulo
-         * @param mensagem
-         * @param botaoPositivo
-         * @param onClickPosi
-         * @param botaoNegativo
-         * @param onClickNega
-         * @return
-         */
         fun show(
             context: Context?,
-            titulo: String?,
-            mensagem: String?,
-            botaoPositivo: String?,
-            onClickPosi: View.OnClickListener?,
-            botaoNegativo: String?,
-            onClickNega: View.OnClickListener?
+            title: String?,
+            message: String?,
+            positiveButton: String?,
+            onPositiveButtonClick: View.OnClickListener?,
+            negativeButton: String?,
+            onNegativeButtonClick: View.OnClickListener?
         ): AlertDialog? {
             val builder =
                 Builder(context!!)
                     .setView(
                         getViewTwoButton(
                             context,
-                            titulo,
-                            mensagem,
-                            botaoPositivo,
-                            onClickPosi,
-                            botaoNegativo,
-                            onClickNega,
+                            title,
+                            message,
+                            positiveButton,
+                            onPositiveButtonClick,
+                            negativeButton,
+                            onNegativeButtonClick,
                             0
                         )
                     )
                     .setCancelable(false)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog?.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog?.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
 
-        /**
-         * Show com opção
-         *
-         * @param context
-         * @param titulo
-         * @param mensagem
-         * @param botaoPositivo
-         * @param onClickPosi
-         * @param botaoNegativo
-         * @param onClickNega
-         * @return
-         */
         fun show(
             context: Context?,
-            titulo: String?,
-            mensagem: String?,
-            botaoPositivo: String?,
-            onClickPosi: View.OnClickListener?,
-            botaoNegativo: String?,
-            onClickNega: View.OnClickListener?,
+            title: String?,
+            message: String?,
+            positiveButton: String?,
+            onPositiveButtonClick: View.OnClickListener?,
+            negativeButton: String?,
+            onNegativeButtonClick: View.OnClickListener?,
             colorCard: Int
         ): AlertDialog? {
             val builder =
@@ -404,22 +359,22 @@ class CustomAlertDialog : AlertDialog {
                     .setView(
                         getViewTwoButton(
                             context,
-                            titulo,
-                            mensagem,
-                            botaoPositivo,
-                            onClickPosi,
-                            botaoNegativo,
-                            onClickNega,
+                            title,
+                            message,
+                            positiveButton,
+                            onPositiveButtonClick,
+                            negativeButton,
+                            onNegativeButtonClick,
                             colorCard
                         )
                     )
                     .setCancelable(false)
-            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
-                mAlertDialog!!.dismiss()
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
-            mAlertDialog = builder.show()
-            mAlertDialog?.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-            return mAlertDialog
+            dialog = builder.show()
+            dialog?.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
+            return dialog
         }
     }
 }

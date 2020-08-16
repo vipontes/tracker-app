@@ -18,6 +18,9 @@ interface RoutePathDao {
     @Query("DELETE FROM user_route_path WHERE user_route_path_id = :userRoutePathId")
     fun delete(userRoutePathId: Long)
 
+    @Query("DELETE FROM user_route_path")
+    fun delete()
+
     @Update
     fun update(dbRoutePath: DbRoutePath)
 }
