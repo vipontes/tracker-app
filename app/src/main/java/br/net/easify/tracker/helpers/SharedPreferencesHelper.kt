@@ -10,48 +10,21 @@ class SharedPreferencesHelper @Inject constructor(context: Context) {
 
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
-    private val currentActivity = "currentActivity"
+    private val currentRoute = "currentRoute"
 
-    fun setCurrentActivity(value: String) {
-        prefs.edit().putString(currentActivity, value).apply()
+    fun setCurrentRoute(value: String) {
+        prefs.edit().putString(currentRoute, value).apply()
     }
 
-    fun getCurrentActivity():String {
+    fun getCurrentRoute():String {
         return if (prefs != null) {
-            prefs.getString(currentActivity, "")!!
+            prefs.getString(currentRoute, "")!!
         } else {
             ""
         }
     }
 
-    fun removeCurrentActivity() {
-        prefs.edit().remove(currentActivity).apply()
+    fun removeCurrentRoute() {
+        prefs.edit().remove(currentRoute).apply()
     }
-
-//    private val token = "token"
-//    private val refreshToken = "refreshToken"
-//
-//    fun setToken(newToken: String) {
-//        prefs.edit().putString(token, newToken).apply()
-//    }
-//
-//    fun getToken():String {
-//        if (prefs != null) {
-//            return prefs.getString(token, "")!!
-//        } else {
-//            return ""
-//        }
-//    }
-//
-//    fun setRefreshToken(newToken: String) {
-//        prefs.edit().putString(refreshToken, newToken).apply()
-//    }
-//
-//    fun getRefreshToken():String {
-//        if (prefs != null) {
-//            return prefs.getString(refreshToken, "")!!
-//        } else {
-//            return ""
-//        }
-//    }
 }

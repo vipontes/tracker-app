@@ -27,7 +27,6 @@ class SettingsViewModel (application: Application) : AndroidViewModel(applicatio
 
     fun logout() {
         database.userDao().delete()
-        database.activityDao().delete()
         database.routeDao().delete()
         database.routePathDao().delete()
         database.tokenDao().delete()

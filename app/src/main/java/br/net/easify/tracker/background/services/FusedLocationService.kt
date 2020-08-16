@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.database.model.DbActivity
+import br.net.easify.tracker.database.model.DbRoute
 import br.net.easify.tracker.database.model.DbRoutePath
 import br.net.easify.tracker.helpers.Constants
 import br.net.easify.tracker.helpers.Formatter
@@ -134,16 +134,16 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
         return null
     }
 
-    private fun getCurrentActivity(): DbActivity? {
-        var activityId: Long = 0
-        prefs.getCurrentActivity().let {
+    private fun getCurrentRoute(): DbRoute? {
+        var routeId: Long = 0
+        prefs.getCurrentRoute().let {
             if (it.isNotEmpty()) {
-                activityId = it.toLong()
+                routeId = it.toLong()
             }
         }
 
-        var activity = database.activityDao().getActivity(activityId)
-        activity?.let {
+        var route = database.routeDao().getRoute(routeId)
+        route?.let {
             return it
         }
 
@@ -189,11 +189,11 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
             intent.putExtra(Constants.latitude, lastLocation.latitude)
             intent.putExtra(Constants.longitude, lastLocation.longitude)
 
-            val activity = getCurrentActivity()
-            activity?.let {
-                if (activity.in_progress == 1) {
+            val route = getCurrentRoute()
+            route?.let {
+                if (route.in_progress == 1) {
                     val currentTime = Formatter.currentDateTimeYMDAsString()
-                    val routeId = activity.user_route_id
+                    val routeId = route.user_route_id!!
                     val path = DbRoutePath(null, routeId, lastLocation.latitude, lastLocation.longitude, lastLocation.altitude, currentTime)
                     database.routePathDao().insert(path)
                 }

@@ -12,8 +12,7 @@ import br.net.easify.tracker.database.model.*
         DbUser::class,
         DbToken::class,
         DbRoute::class,
-        DbRoutePath::class,
-        DbActivity::class
+        DbRoutePath::class
     ],
     version = 1,
     exportSchema = false
@@ -23,7 +22,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tokenDao(): TokenDao
     abstract fun routeDao(): RouteDao
     abstract fun routePathDao(): RoutePathDao
-    abstract fun activityDao(): ActivityDao
 
     companion object {
         private var instance: AppDatabase? = null

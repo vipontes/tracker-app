@@ -15,7 +15,6 @@ import br.net.easify.tracker.api.RouteService
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.background.services.TimerService
 import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.database.model.DbActivity
 import br.net.easify.tracker.database.model.DbRoute
 import br.net.easify.tracker.database.model.DbRoutePath
 import br.net.easify.tracker.enums.TrackerActivityState
@@ -34,7 +33,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     val trackerActivityState by lazy { MutableLiveData<TrackerActivityState>() }
     val currentLocation by lazy { MutableLiveData<GeoPoint>() }
-    val trackerActivity by lazy { MutableLiveData<DbActivity>() }
+    val trackerRoute by lazy { MutableLiveData<DbRoute>() }
     val toastMessage by lazy { MutableLiveData<Response>() }
 
     private var routeService = RouteService(application)
@@ -63,11 +62,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         override fun onReceive(context: Context, intent: Intent) {
             val resultCode = intent.getIntExtra(Constants.resultCode, Activity.RESULT_CANCELED)
             if (resultCode == Activity.RESULT_OK) {
-                var activity = trackerActivity.value
-                activity?.let {
+                val route = trackerRoute.value as DbRoute
+                route.let {
                     val elapsedTime = intent.getLongExtra(Constants.elapsedTime, 0)
                     val displayData = Formatter.hmsTimeFormatter(elapsedTime)
-                    val path = database.routePathDao().getPathFromRoute(activity.user_route_id)
+                    val path = database.routePathDao().getPathFromRoute(route.user_route_id!!)
                     val loggedUser = database.userDao().getLoggedUser()
                     var userWeight = Constants.defaultWeight
                     loggedUser?.let {
@@ -80,14 +79,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     val calories = TrackerHelper.calculateCalories(userWeight, path)
                     val speed = TrackerHelper.calculateAverageSpeedInKmPerHour(path)
 
-                    activity.duration = displayData
-                    activity.rhythm = formattedRhythm
-                    activity.distance = Formatter.decimalFormatterTwoDigits(distance)
-                    activity.calories = Formatter.decimalFormatterOneDigit(calories)
-                    activity.speed = Formatter.decimalFormatterOneDigit(speed)
+                    route.user_route_duration = displayData
+                    route.user_route_rhythm = formattedRhythm
+                    route.user_route_distance = Formatter.decimalFormatterTwoDigits(distance)
+                    route.user_route_calories = Formatter.decimalFormatterOneDigit(calories)
+                    route.user_route_speed = Formatter.decimalFormatterOneDigit(speed)
 
-                    trackerActivity.value = activity
-                    database.activityDao().update(activity)
+                    trackerRoute.value = route
+                    database.routeDao().update(route)
                 }
             }
         }
@@ -105,7 +104,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         LocalBroadcastManager.getInstance(getApplication())
             .registerReceiver(onTimerServiceNotification, timerIntent)
 
-        trackerActivity.value = DbActivity(
+        trackerRoute.value = DbRoute(
             0,
             0,
             getApplication<Application>().resources.getString(R.string.default_duration),
@@ -113,10 +112,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             getApplication<Application>().resources.getString(R.string.default_calories),
             getApplication<Application>().resources.getString(R.string.default_rhythm),
             getApplication<Application>().resources.getString(R.string.default_speed),
-            0,
-            0,
             "",
-            null
+            "",
+            null,
+            0,
+            0
         )
 
         checkRunningActivity()
@@ -124,19 +124,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun checkRunningActivity() {
 
-        var activityId: Long = 0
-        prefs.getCurrentActivity().let {
+        var routeId: Long = 0
+        prefs.getCurrentRoute().let {
             if (it.isNotEmpty()) {
-                activityId = it.toLong()
+                routeId = it.toLong()
             }
         }
 
-        val activity = database.activityDao().getActivity(activityId)
-        activity?.let {
+        val route = database.routeDao().getRoute(routeId)
+        route?.let {
 
-            if (activity.in_progress == 1) {
+            if (route.in_progress == 1) {
                 trackerActivityState.value = TrackerActivityState.started
-                val routeId = activity.user_route_id
+                val routeId = route.user_route_id!!
                 val routePathList = database.routePathDao().getPathFromRoute(routeId)
                 if (routePathList.isNotEmpty()) {
                     val routePath = routePathList.last()
@@ -169,14 +169,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return true
     }
 
-    fun startTimerService() {
+    private fun startTimerService() {
         val intent = Intent(getApplication(), TimerService::class.java)
         if (!serviceHelper.isMyServiceRunning(TimerService::class.java)) {
             (getApplication() as MainApplication).startService(intent)
         }
     }
 
-    fun stopTimerService() {
+    private fun stopTimerService() {
         val intent = Intent(getApplication(), TimerService::class.java)
         if (serviceHelper.isMyServiceRunning(TimerService::class.java)) {
             (getApplication() as MainApplication).stopService(intent)
@@ -190,43 +190,34 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         startPoint?.let { pt: GeoPoint ->
             val userId = database.userDao().getLoggedUser()?.user_Id
             userId?.let {
-                // 1 - Create a route
                 val startTime = Formatter.currentDateTimeDMYAsString();
                 val databaseFieldTime = Formatter.currentDateTimeYMDAsString();
                 val description = "Activity $startTime"
 
-                val route = DbRoute(null, userId, description, databaseFieldTime, null)
+                val route = DbRoute(
+                    null,
+                    userId,
+                    getApplication<Application>().resources.getString(R.string.default_duration),
+                    getApplication<Application>().resources.getString(R.string.default_distance),
+                    getApplication<Application>().resources.getString(R.string.default_calories),
+                    getApplication<Application>().resources.getString(R.string.default_rhythm),
+                    getApplication<Application>().resources.getString(R.string.default_speed),
+                    description,
+                    databaseFieldTime,
+                    null,
+                    1,
+                    0
+                )
                 val routeId = database.routeDao().insert(route)
 
                 if (routeId > 0) {
-                    // 2 - Create a path
+                    route.user_route_id = routeId
+                    database.routeDao().update(route)
                     val routePath = DbRoutePath(null, routeId, pt.latitude, pt.longitude, pt.altitude, databaseFieldTime)
                     database.routePathDao().insert(routePath)
-
-                    // 3 - Create an activity
-                    val activity = DbActivity(
-                        null,
-                        routeId,
-                        getApplication<Application>().resources.getString(R.string.default_duration),
-                        getApplication<Application>().resources.getString(R.string.default_distance),
-                        getApplication<Application>().resources.getString(R.string.default_calories),
-                        getApplication<Application>().resources.getString(R.string.default_rhythm),
-                        getApplication<Application>().resources.getString(R.string.default_speed),
-                        1,
-                        0,
-                        databaseFieldTime,
-                        null
-                    )
-                    val activityId = database.activityDao().insert(activity)
-
-                    // 4 - Save activityId to preferences
-                    prefs.setCurrentActivity(activityId.toString())
-
-                    // 5 - Report tracker state
+                    prefs.setCurrentRoute(routeId.toString())
                     trackerActivityState.value = TrackerActivityState.started
-
-                    trackerActivity.value = activity
-
+                    trackerRoute.value = route
                     startTimerService()
                 } else {
                     toastMessage.value =
@@ -237,14 +228,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun stopTracker() {
-        val activity = getCurrentActivity()
-        activity?.let {
+        val route = getCurrentRoute()
+        route?.let {
             val stopDatetime = Formatter.currentDateTimeYMDAsString();
-            finishTrackerActivity(activity, stopDatetime)
-            if ( finishUserRoute(activity, stopDatetime) ) {
-                sendNotificationToHomeFragment(activity)
+            finishTrackerActivity(route, stopDatetime)
+            if ( finishUserRoute(route, stopDatetime) ) {
+                sendNotificationToHomeFragment(route)
                 stopTimerService()
-                synchronizeTrackingActivity(activity)
+                synchronizeTrackingActivity(route)
             } else {
                 toastMessage.value =
                     Response((getApplication() as MainApplication).getString(R.string.stopping_tracking_error))
@@ -252,9 +243,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun synchronizeTrackingActivity(activity: DbActivity) {
+    private fun synchronizeTrackingActivity(route: DbRoute) {
         val userId = database.userDao().getLoggedUser()?.user_Id!!
-        val route = database.routeDao().getRoute(activity.user_route_id)!!
         val data = getRoutePost(route, userId)
 
         disposable.add(
@@ -263,6 +253,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableSingleObserver<Route>() {
                     override fun onSuccess(res: Route) {
+                        route.sync = 1
+                        database.routeDao().update(route)
+
                         toastMessage.value =
                             Response((getApplication() as MainApplication).getString(R.string.tracking_successfully_saved))
                     }
@@ -305,6 +298,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         return RoutePost(
             userId,
+            route.user_route_duration,
+            route.user_route_distance,
+            route.user_route_calories,
+            route.user_route_rhythm,
+            route.user_route_speed,
             route.user_route_description,
             route.user_route_start_time,
             route.user_route_end_time,
@@ -312,43 +310,36 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    private fun sendNotificationToHomeFragment(activity: DbActivity?) {
-        prefs.removeCurrentActivity()
+    private fun sendNotificationToHomeFragment(route: DbRoute) {
+        prefs.removeCurrentRoute()
         trackerActivityState.value = TrackerActivityState.idle
-        trackerActivity.value = activity
+        trackerRoute.value = route
     }
 
-    private fun finishTrackerActivity(activity: DbActivity, stopDatetime: String) {
-        activity.in_progress = 0
-        activity.finished_at = stopDatetime
-        database.activityDao().update(activity)
+    private fun finishTrackerActivity(route: DbRoute, stopDatetime: String) {
+        route.in_progress = 0
+        database.routeDao().update(route)
     }
 
-    private fun finishUserRoute(activity: DbActivity, stopDatetime: String): Boolean {
-        val routeId = activity.user_route_id
-        val route = database.routeDao().getRoute(routeId)
-        route?.let {
-            it.user_route_end_time = stopDatetime
-            return database.routeDao().update(it) > 0
-        }
-
-        return false
+    private fun finishUserRoute(route: DbRoute, stopDatetime: String): Boolean {
+        route.user_route_end_time = stopDatetime
+        return database.routeDao().update(route) > 0
     }
 
     fun getTrackerState(): TrackerActivityState? {
         return trackerActivityState.value
     }
 
-    private fun getCurrentActivity(): DbActivity? {
-        var activityId: Long = 0
-        prefs.getCurrentActivity().let {
+    private fun getCurrentRoute(): DbRoute? {
+        var routeId: Long = 0
+        prefs.getCurrentRoute().let {
             if (it.isNotEmpty()) {
-                activityId = it.toLong()
+                routeId = it.toLong()
             }
         }
 
-        val activity = database.activityDao().getActivity(activityId)
-        activity?.let {
+        val route = database.routeDao().getRoute(routeId)
+        route?.let {
             return it
         }
 
@@ -358,9 +349,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun getCurrentTrackerPath() : ArrayList<GeoPoint> {
         val path: ArrayList<GeoPoint> = arrayListOf()
 
-        val activity = getCurrentActivity()
-        activity?.let {
-            val routeId = activity.user_route_id
+        val route = getCurrentRoute()
+        route?.let {
+            val routeId = route.user_route_id!!
             val routePath = database.routePathDao().getPathFromRoute(routeId)
             for (point in routePath) {
                 path.add(GeoPoint(point.user_route_path_lat, point.user_route_path_lng))

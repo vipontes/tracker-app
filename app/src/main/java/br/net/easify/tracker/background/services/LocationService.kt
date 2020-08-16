@@ -16,7 +16,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.database.model.DbActivity
+import br.net.easify.tracker.database.model.DbRoute
 import br.net.easify.tracker.database.model.DbRoutePath
 import br.net.easify.tracker.helpers.Constants
 import br.net.easify.tracker.helpers.Formatter
@@ -92,16 +92,16 @@ class LocationService : Service(), LocationListener {
         return null
     }
 
-    private fun getCurrentActivity(): DbActivity? {
-        var activityId: Long = 0
-        prefs.getCurrentActivity().let {
+    private fun getCurrentRoute(): DbRoute? {
+        var routeId: Long = 0
+        prefs.getCurrentRoute().let {
             if (it.isNotEmpty()) {
-                activityId = it.toLong()
+                routeId = it.toLong()
             }
         }
 
-        var activity = database.activityDao().getActivity(activityId)
-        activity?.let {
+        var route = database.routeDao().getRoute(routeId)
+        route?.let {
             return it
         }
 
@@ -119,11 +119,11 @@ class LocationService : Service(), LocationListener {
                 (it.latitude != previousLocation.latitude &&
                 it.longitude != previousLocation.longitude)
             ) {
-                val activity = getCurrentActivity()
-                activity?.let { value: DbActivity ->
+                val route = getCurrentRoute()
+                route?.let { value: DbRoute ->
                     if (value.in_progress == 1) {
                         val currentTime = Formatter.currentDateTimeYMDAsString()
-                        val routeId = value.user_route_id
+                        val routeId = value.user_route_id!!
                         val path = DbRoutePath(null, routeId, it.latitude, it.longitude, it.altitude, currentTime)
                         database.routePathDao().insert(path)
                     }
