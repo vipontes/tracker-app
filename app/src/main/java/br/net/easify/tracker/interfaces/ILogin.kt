@@ -8,7 +8,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface ILogin {
-    @POST("/v1/login")
+    @POST("login")
     @Headers("No-Authentication: true")
     fun login(@Body data: LoginBody): Single<Token>
 }

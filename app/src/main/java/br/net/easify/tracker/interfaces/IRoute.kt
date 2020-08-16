@@ -10,9 +10,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface IRoute {
-    @POST("/v1/route")
+    @POST("route")
     fun postRoute(@Body data: RoutePost): Single<Route>
 
-    @GET("/v1/routes/{userId}")
+    @GET("routes/{userId}")
     fun getRoutesByUser(@Path("userId") userId: Int): Single<List<Route>>
 }

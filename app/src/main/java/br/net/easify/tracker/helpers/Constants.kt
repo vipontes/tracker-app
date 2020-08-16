@@ -2,7 +2,7 @@ package br.net.easify.tracker.helpers
 
 class Constants {
     companion object {
-        const val apiUrl = "http://tracker2.easify.info"
+        const val apiUrl = "http://tracker2.easify.info/v1/"
         const val channelId = "trackerServiceChannel"
         const val provider = "provider"
         const val altitude = "altitude"
