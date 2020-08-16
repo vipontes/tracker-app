@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.database.AppDatabase
 import br.net.easify.tracker.database.model.DbRoute
+import br.net.easify.tracker.helpers.Formatter
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -13,6 +14,7 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
     private val disposable = CompositeDisposable()
 
     val routes by lazy { MutableLiveData<List<DbRoute>>() }
+    val totalDistance by lazy { MutableLiveData<String>() }
 
     @Inject
     lateinit var database: AppDatabase
@@ -22,7 +24,24 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
     }
 
     fun refresh() {
-        routes.value = database.routeDao().getAll()
+        val localRoutes = database.routeDao().getAll()
+        localRoutes?.let {
+            val summarized = summarizeDistance(it)
+            totalDistance.value = Formatter.decimalFormatterTwoDigits(summarized)
+        }
+
+        routes.value = localRoutes
+    }
+
+    private fun summarizeDistance(routes: List<DbRoute>): Double {
+        var distance = 0.0;
+        for (item in routes) {
+            val itemDistance = item.user_route_distance
+                .replace(",", ".")
+                .toDouble()
+            distance += itemDistance
+        }
+        return distance
     }
 
     override fun onCleared() {
