@@ -4,7 +4,7 @@
     <data>
         <variable
             name="route"
-            type="br.net.easify.tracker.database.model.DbRoute" />
+            type="br.net.easify.tracker.repositories.database.model.DbRoute" />
     </data>
 
     <LinearLayout
