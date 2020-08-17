@@ -6,7 +6,6 @@ import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.di.module.*
 import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
-import br.net.easify.tracker.repositories.TokenRepository
 import br.net.easify.tracker.repositories.UserRepository
 import br.net.easify.tracker.viewmodel.*
 import dagger.Component
@@ -38,7 +37,6 @@ interface AppComponent {
     fun inject(interceptor: AuthInterceptor)
 
     fun inject(repository: UserRepository)
-    fun inject(repository: TokenRepository)
     fun inject(repository: RouteRepository)
     fun inject(repository: RoutePathRepository)
 }

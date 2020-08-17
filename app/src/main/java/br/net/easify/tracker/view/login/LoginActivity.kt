@@ -32,9 +32,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var dataBinding: ActivityLoginBinding
 
     private val tokensObserver = Observer<Token> {
-
-        var tokenLocal = DbToken(it.token, it.refreshToken)
-        viewModel.saveTokens(tokenLocal)
         viewModel.getUserFromToken()
     }
 
@@ -53,11 +50,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private val userObserver = Observer<User> { data: User ->
-        data.let {
-            viewModel.saveLoggedUser(data)
+    private val userObserver = Observer<User> {
             startMainActivity()
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,9 +92,10 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         viewModel.loginBody.observe(this, loginObserver)
-        viewModel.loggedUser.observe(this, userObserver)
-        viewModel.tokens.observe(this, tokensObserver)
-        viewModel.errorResponse.observe(this, errorMessageObserver)
+        viewModel.getUser().observe(this, userObserver)
+        viewModel.getTokens().observe(this, tokensObserver)
+        viewModel.getErrorResponse().observe(this, errorMessageObserver)
+        viewModel.error.observe(this, errorMessageObserver)
 
         dataBinding.loginButton.setOnClickListener(View.OnClickListener {
             if ( viewModel.validate() ) {
