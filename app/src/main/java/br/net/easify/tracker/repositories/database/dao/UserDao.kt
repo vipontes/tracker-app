@@ -12,9 +12,6 @@ interface UserDao {
     @Query("SELECT * FROM user LIMIT 1")
     fun getLoggedUser(): DbUser?
 
-    @Query("SELECT * FROM user ORDER BY user_id")
-    fun getAll(): List<DbUser>?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(dbUser: DbUser): Long
 

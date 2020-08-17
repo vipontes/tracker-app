@@ -15,34 +15,17 @@ import javax.inject.Inject
 class SettingsViewModel (application: Application) : AndroidViewModel(application) {
     private val disposable = CompositeDisposable()
 
-    val userData by lazy { MutableLiveData<DbUser>() }
-
-    @Inject
-    lateinit var tokenRepository: TokenRepository
-
     @Inject
     lateinit var userRepository: UserRepository
 
-    @Inject
-    lateinit var routeRepository: RouteRepository
-
-    @Inject
-    lateinit var routePathRepository: RoutePathRepository
-
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
-        val loggedUser = userRepository.getLoggedUser()
-        loggedUser?.let {
-            userData.value = it
-        }
     }
 
+    fun getUserData(): MutableLiveData<DbUser> = userRepository.getUserData()
+
     fun logout() {
-        userRepository.delete()
-        routeRepository.delete()
-        routePathRepository.delete()
-        tokenRepository.delete()
-        userData.value = null
+        userRepository.logout()
     }
 
     override fun onCleared() {

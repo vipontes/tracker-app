@@ -43,7 +43,7 @@ class SettingsFragment : Fragment() {
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
 
         viewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
-        viewModel.userData.observe(viewLifecycleOwner, userDataObserver)
+        viewModel.getUserData().observe(viewLifecycleOwner, userDataObserver)
 
         return dataBinding.root
     }

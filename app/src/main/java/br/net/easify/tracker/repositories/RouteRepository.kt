@@ -8,7 +8,6 @@ import br.net.easify.tracker.repositories.database.model.DbRoute
 import javax.inject.Inject
 
 class RouteRepository (application: Application) : AndroidViewModel(application) {
-
     @Inject
     lateinit var database: AppDatabase
 
