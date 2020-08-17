@@ -1,6 +1,6 @@
 package br.net.easify.tracker.helpers
 
-import br.net.easify.tracker.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.DbRoutePath
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.sqrt

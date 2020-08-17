@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
-import br.net.easify.tracker.database.model.DbUser
+import br.net.easify.tracker.repositories.database.model.DbUser
 import br.net.easify.tracker.databinding.FragmentSettingsBinding
 import br.net.easify.tracker.helpers.CustomAlertDialog
 import br.net.easify.tracker.view.login.LoginActivity

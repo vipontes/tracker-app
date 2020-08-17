@@ -1,11 +1,11 @@
-package br.net.easify.tracker.database
+package br.net.easify.tracker.repositories.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import br.net.easify.tracker.database.dao.*
-import br.net.easify.tracker.database.model.*
+import br.net.easify.tracker.repositories.database.dao.*
+import br.net.easify.tracker.repositories.database.model.*
 
 @Database(
     entities = [

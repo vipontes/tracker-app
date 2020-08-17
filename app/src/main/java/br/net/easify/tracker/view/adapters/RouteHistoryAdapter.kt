@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import br.net.easify.tracker.R
-import br.net.easify.tracker.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.DbRoute
 import br.net.easify.tracker.databinding.HolderRouteBinding
 
 class RouteHistoryAdapter(private var routes: ArrayList<DbRoute>): RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {

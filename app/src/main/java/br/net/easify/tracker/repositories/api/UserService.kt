@@ -1,19 +1,15 @@
-package br.net.easify.tracker.api
+package br.net.easify.tracker.repositories.api
 
 import android.app.Application
-import br.net.easify.tracker.MainApplication
-import br.net.easify.tracker.database.model.DbToken
-import br.net.easify.tracker.interfaces.IUser
+import br.net.easify.tracker.repositories.api.interfaces.IUser
 import br.net.easify.tracker.model.User
-import br.net.easify.tracker.api.interceptor.AuthInterceptor
-import br.net.easify.tracker.database.AppDatabase
+import br.net.easify.tracker.repositories.api.interceptor.AuthInterceptor
 import br.net.easify.tracker.helpers.Constants
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Inject
 
 class UserService (application: Application) {
 

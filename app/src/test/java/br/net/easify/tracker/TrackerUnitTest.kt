@@ -1,6 +1,6 @@
 package br.net.easify.tracker
 
-import br.net.easify.tracker.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.DbRoutePath
 import br.net.easify.tracker.helpers.TrackerHelper
 import org.junit.Test
 

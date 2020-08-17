@@ -1,7 +1,6 @@
-package br.net.easify.tracker.database.model
+package br.net.easify.tracker.repositories.database.model
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "user_route")

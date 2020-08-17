@@ -5,15 +5,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
-import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.database.model.DbToken
-import br.net.easify.tracker.database.model.DbUser
+import br.net.easify.tracker.repositories.database.model.DbToken
+import br.net.easify.tracker.repositories.database.model.DbUser
 import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.model.User
-import br.net.easify.tracker.api.LoginService
-import br.net.easify.tracker.api.UserService
+import br.net.easify.tracker.repositories.api.LoginService
+import br.net.easify.tracker.repositories.api.UserService
+import br.net.easify.tracker.repositories.TokenRepository
+import br.net.easify.tracker.repositories.UserRepository
 import com.auth0.android.jwt.JWT
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -35,7 +36,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private var userService = UserService(application)
 
     @Inject
-    lateinit var database: AppDatabase
+    lateinit var tokenRepository: TokenRepository
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
@@ -82,8 +86,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun saveTokens(tokens: DbToken) {
-        database.tokenDao().delete()
-        database.tokenDao().insert(tokens)
+        tokenRepository.delete()
+        tokenRepository.insert(tokens)
     }
 
     fun saveLoggedUser(user: User) {
@@ -101,17 +105,17 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             user.refreshToken
         )
 
-        database.userDao().delete()
-        database.userDao().insert(dbUser)
+        userRepository.delete()
+        userRepository.insert(dbUser)
     }
 
     fun getLoggedUser(): DbUser? {
-        return database.userDao().getLoggedUser()
+        return userRepository.getLoggedUser()
     }
 
     fun getUserFromToken() {
 
-        val dbToken = database.tokenDao().get()
+        val dbToken = tokenRepository.get()
         dbToken?.let { tokens: DbToken ->
             val jwt = JWT(tokens.token)
             val userId = jwt.getClaim("userId").asInt()

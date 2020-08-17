@@ -1,9 +1,9 @@
-package br.net.easify.tracker.api
+package br.net.easify.tracker.repositories.api
 
 import android.app.Application
-import br.net.easify.tracker.api.interceptor.AuthInterceptor
+import br.net.easify.tracker.repositories.api.interceptor.AuthInterceptor
 import br.net.easify.tracker.helpers.Constants
-import br.net.easify.tracker.interfaces.IRoute
+import br.net.easify.tracker.repositories.api.interfaces.IRoute
 import br.net.easify.tracker.model.Route
 import br.net.easify.tracker.model.RoutePost
 import io.reactivex.Single

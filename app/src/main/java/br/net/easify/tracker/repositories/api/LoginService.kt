@@ -1,6 +1,6 @@
-package br.net.easify.tracker.api
+package br.net.easify.tracker.repositories.api
 
-import br.net.easify.tracker.interfaces.ILogin
+import br.net.easify.tracker.repositories.api.interfaces.ILogin
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.helpers.Constants

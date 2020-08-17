@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
-import br.net.easify.tracker.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.DbRoute
 import br.net.easify.tracker.databinding.FragmentHomeBinding
 import br.net.easify.tracker.enums.TrackerActivityState
 import br.net.easify.tracker.helpers.CustomAlertDialog

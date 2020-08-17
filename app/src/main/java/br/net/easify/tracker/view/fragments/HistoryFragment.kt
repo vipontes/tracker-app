@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.net.easify.tracker.R
-import br.net.easify.tracker.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.DbRoute
 import br.net.easify.tracker.databinding.FragmentHistoryBinding
 import br.net.easify.tracker.view.adapters.RouteHistoryAdapter
 import br.net.easify.tracker.viewmodel.HistoryViewModel

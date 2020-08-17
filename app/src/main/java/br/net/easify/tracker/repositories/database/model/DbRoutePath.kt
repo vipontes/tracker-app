@@ -1,4 +1,4 @@
-package br.net.easify.tracker.database.model
+package br.net.easify.tracker.repositories.database.model
 
 import androidx.room.Entity
 import androidx.room.Index

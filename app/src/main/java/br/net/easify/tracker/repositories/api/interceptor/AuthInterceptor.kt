@@ -1,9 +1,9 @@
-package br.net.easify.tracker.api.interceptor
+package br.net.easify.tracker.repositories.api.interceptor
 
 import android.app.Application
 import br.net.easify.tracker.MainApplication
-import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.database.model.DbToken
+import br.net.easify.tracker.repositories.database.AppDatabase
+import br.net.easify.tracker.repositories.database.model.DbToken
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response

@@ -1,13 +1,13 @@
-package br.net.easify.tracker.database.dao
+package br.net.easify.tracker.repositories.database.dao
 
 import androidx.room.*
-import br.net.easify.tracker.database.model.DbUser
+import br.net.easify.tracker.repositories.database.model.DbUser
 
 @Dao
 interface UserDao {
 
     @Query("SELECT * FROM user WHERE user_id = :userId")
-    fun getUser(userId: Long?): DbUser?
+    fun getUser(userId: Long): DbUser?
 
     @Query("SELECT * FROM user LIMIT 1")
     fun getLoggedUser(): DbUser?

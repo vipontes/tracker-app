@@ -1,7 +1,7 @@
-package br.net.easify.tracker.database.dao
+package br.net.easify.tracker.repositories.database.dao
 
 import androidx.room.*
-import br.net.easify.tracker.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.DbRoutePath
 
 @Dao
 interface RoutePathDao {

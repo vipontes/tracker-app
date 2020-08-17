@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.MainApplication
-import br.net.easify.tracker.database.AppDatabase
-import br.net.easify.tracker.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.DbRoute
 import br.net.easify.tracker.helpers.Formatter
+import br.net.easify.tracker.repositories.RouteRepository
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -17,14 +17,14 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
     val totalDistance by lazy { MutableLiveData<String>() }
 
     @Inject
-    lateinit var database: AppDatabase
+    lateinit var routeRepository: RouteRepository
 
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
     }
 
     fun refresh() {
-        val localRoutes = database.routeDao().getAll()
+        val localRoutes = routeRepository.getAll()
         localRoutes?.let {
             val summarized = summarizeDistance(it)
             totalDistance.value = Formatter.decimalFormatterTwoDigits(summarized)

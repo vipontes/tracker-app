@@ -1,20 +1,24 @@
 package br.net.easify.tracker.di.component
 
 import br.net.easify.tracker.MainApplication
-import br.net.easify.tracker.api.RouteService
-import br.net.easify.tracker.api.UserService
-import br.net.easify.tracker.api.interceptor.AuthInterceptor
+import br.net.easify.tracker.repositories.api.interceptor.AuthInterceptor
 import br.net.easify.tracker.background.services.LocationService
-import br.net.easify.tracker.di.module.AppModule
-import br.net.easify.tracker.di.module.DatabaseModule
-import br.net.easify.tracker.di.module.PrefsModule
-import br.net.easify.tracker.di.module.ServiceModule
+import br.net.easify.tracker.di.module.*
+import br.net.easify.tracker.repositories.RoutePathRepository
+import br.net.easify.tracker.repositories.RouteRepository
+import br.net.easify.tracker.repositories.TokenRepository
+import br.net.easify.tracker.repositories.UserRepository
 import br.net.easify.tracker.viewmodel.*
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, DatabaseModule::class, PrefsModule::class, ServiceModule::class])
+@Component(modules = [
+    AppModule::class,
+    DatabaseModule::class,
+    PrefsModule::class,
+    ServiceModule::class,
+    RepositoryModule::class])
 interface AppComponent {
     @Component.Builder
     interface Builder {
@@ -23,11 +27,18 @@ interface AppComponent {
     }
 
     fun inject(app: MainApplication)
+
     fun inject(viewModel: LoginViewModel)
     fun inject(viewModel: MainViewModel)
     fun inject(viewModel: HomeViewModel)
     fun inject(viewModel: HistoryViewModel)
     fun inject(viewModel: SettingsViewModel)
+
     fun inject(locationService: LocationService)
     fun inject(interceptor: AuthInterceptor)
+
+    fun inject(repository: UserRepository)
+    fun inject(repository: TokenRepository)
+    fun inject(repository: RouteRepository)
+    fun inject(repository: RoutePathRepository)
 }

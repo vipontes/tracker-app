@@ -1,4 +1,4 @@
-package br.net.easify.tracker.interfaces
+package br.net.easify.tracker.repositories.api.interfaces
 
 import br.net.easify.tracker.model.User
 import io.reactivex.Single
