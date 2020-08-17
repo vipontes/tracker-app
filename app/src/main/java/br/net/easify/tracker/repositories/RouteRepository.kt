@@ -135,6 +135,7 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
                                     1
                                 )
 
+                                insert(route)
                                 routesFromApi.add(route)
                             }
 
@@ -169,7 +170,6 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
     fun delete() = database.routeDao().delete()
 
     fun update(dbRoute: DbRoute): Int = database.routeDao().update(dbRoute)
-
 
     override fun onCleared() {
         super.onCleared()
