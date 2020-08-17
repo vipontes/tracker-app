@@ -16,8 +16,6 @@ import javax.inject.Inject
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val disposable = CompositeDisposable()
-
     val loginBody by lazy { MutableLiveData<LoginBody>() }
     val error by lazy { MutableLiveData<Response>() }
 
@@ -26,6 +24,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
+        userRepository.checkUserData()
         loginBody.value = LoginBody("", "")
     }
 
@@ -36,12 +35,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             userRepository.checkLogin(email, password)
         }
     }
-
-    fun getTokens(): MutableLiveData<Token> = userRepository.getTokens()
-
-    fun getErrorResponse(): MutableLiveData<Response> = userRepository.getErrorResponse()
-
-    fun getUser(): MutableLiveData<User> = userRepository.getUser()
 
     fun getUserFromToken() = userRepository.getUserFromToken()
 
@@ -69,9 +62,4 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-
-        disposable.clear()
-    }
 }

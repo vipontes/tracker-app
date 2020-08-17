@@ -11,9 +11,7 @@ import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
 class HistoryViewModel (application: Application) : AndroidViewModel(application) {
-    private val disposable = CompositeDisposable()
 
-    val routes by lazy { MutableLiveData<List<DbRoute>>() }
     val totalDistance by lazy { MutableLiveData<String>() }
 
     @Inject
@@ -24,29 +22,27 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
     }
 
     fun refresh() {
-        val localRoutes = routeRepository.getAll()
-        localRoutes?.let {
+        routeRepository.getAll()
+    }
+
+    fun getTotalDistance() {
+        val routesFromDb = routeRepository.routes.value
+        routesFromDb?.let {
             val summarized = summarizeDistance(it)
             totalDistance.value = Formatter.decimalFormatterTwoDigits(summarized)
         }
-
-        routes.value = localRoutes
     }
 
     private fun summarizeDistance(routes: List<DbRoute>): Double {
         var distance = 0.0;
         for (item in routes) {
-            val itemDistance = item.user_route_distance
-                .replace(",", ".")
-                .toDouble()
-            distance += itemDistance
+            item.user_route_distance?.let {
+                val itemDistance = it
+                    .replace(",", ".")
+                    .toDouble()
+                distance += itemDistance
+            }
         }
         return distance
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        disposable.clear()
     }
 }

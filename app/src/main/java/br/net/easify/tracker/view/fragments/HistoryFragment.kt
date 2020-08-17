@@ -23,6 +23,7 @@ class HistoryFragment : Fragment() {
     private val routesObserver = Observer<List<DbRoute>> { list ->
         list?.let {
             routesAdapter.updateRoutes(it)
+            viewModel.getTotalDistance()
         }
     }
 
@@ -37,7 +38,7 @@ class HistoryFragment : Fragment() {
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_history, container, false)
 
         viewModel = ViewModelProviders.of(this).get(HistoryViewModel::class.java)
-        viewModel.routes.observe(viewLifecycleOwner, routesObserver)
+        viewModel.routeRepository.routes.observe(viewLifecycleOwner, routesObserver)
         viewModel.totalDistance.observe(viewLifecycleOwner, totalDistanceObserver)
         viewModel.refresh()
 

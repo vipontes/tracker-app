@@ -92,9 +92,9 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         viewModel.loginBody.observe(this, loginObserver)
-        viewModel.getUser().observe(this, userObserver)
-        viewModel.getTokens().observe(this, tokensObserver)
-        viewModel.getErrorResponse().observe(this, errorMessageObserver)
+        viewModel.userRepository.loggedUser.observe(this, userObserver)
+        viewModel.userRepository.tokens.observe(this, tokensObserver)
+        viewModel.userRepository.errorResponse.observe(this, errorMessageObserver)
         viewModel.error.observe(this, errorMessageObserver)
 
         dataBinding.loginButton.setOnClickListener(View.OnClickListener {

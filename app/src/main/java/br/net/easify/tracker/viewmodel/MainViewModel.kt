@@ -10,8 +10,6 @@ import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-    private val disposable = CompositeDisposable()
-
     @Inject
     lateinit var serviceHelper: ServiceHelper
 
@@ -25,11 +23,5 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (!serviceHelper.isMyServiceRunning(gpsService::class.java)) {
             (getApplication() as MainApplication).startService(gpsIntent)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        disposable.clear()
     }
 }

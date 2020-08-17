@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Route (
-    var userRouteId: Int,
-    var userId: Int,
+    var userRouteId: Long,
+    var userId: Long,
     var userRouteDuration: String?,
     var userRouteDistance: String?,
     var userRouteCalories: String?,
@@ -16,8 +16,8 @@ data class Route (
     var userRouteEndTime: String?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readInt(),
-        parcel.readInt(),
+        parcel.readLong(),
+        parcel.readLong(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
@@ -30,8 +30,8 @@ data class Route (
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(userRouteId)
-        parcel.writeInt(userId)
+        parcel.writeLong(userRouteId)
+        parcel.writeLong(userId)
         parcel.writeString(userRouteDuration)
         parcel.writeString(userRouteDistance)
         parcel.writeString(userRouteCalories)
@@ -56,6 +56,3 @@ data class Route (
         }
     }
 }
-
-
-

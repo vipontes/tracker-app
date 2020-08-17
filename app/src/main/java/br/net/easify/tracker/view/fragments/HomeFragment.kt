@@ -87,8 +87,8 @@ class HomeFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         viewModel.trackerActivityState.observe(viewLifecycleOwner, trackerActivityStateObserver)
         viewModel.currentLocation.observe(viewLifecycleOwner, currentLocationObserver)
-        viewModel.toastMessage.observe(viewLifecycleOwner, toastMessageObserver)
-        viewModel.trackerRoute.observe(viewLifecycleOwner, trackerActivityObserver)
+        viewModel.routeRepository.toastMessage.observe(viewLifecycleOwner, toastMessageObserver)
+        viewModel.routeRepository.trackerRoute.observe(viewLifecycleOwner, trackerActivityObserver)
 
         return dataBinding.root
     }

@@ -3,7 +3,6 @@ package br.net.easify.tracker.di.module
 import android.app.Application
 import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
-import br.net.easify.tracker.repositories.TokenRepository
 import br.net.easify.tracker.repositories.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -16,12 +15,6 @@ class RepositoryModule {
     @Singleton
     fun provideUserRepository(application: Application): UserRepository {
         return UserRepository(application)
-    }
-
-    @Provides
-    @Singleton
-    fun provideTokenRepository(application: Application): TokenRepository {
-        return TokenRepository(application)
     }
 
     @Provides

@@ -23,10 +23,12 @@ import javax.inject.Inject
 
 class UserRepository(application: Application) : AndroidViewModel(application) {
     private val disposable = CompositeDisposable()
-    private val userData = MutableLiveData<DbUser>()
-    private val tokens = MutableLiveData<Token>()
-    private val errorResponse = MutableLiveData<Response>()
-    private val loggedUser = MutableLiveData<User>()
+
+    var userData = MutableLiveData<DbUser>()
+    var tokens = MutableLiveData<Token>()
+    var errorResponse = MutableLiveData<Response>()
+    var loggedUser = MutableLiveData<User>()
+
     private var loginService = LoginService()
     private var userService = UserService(application)
 
@@ -37,30 +39,22 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
     }
 
-    fun getTokens(): MutableLiveData<Token> {
-        return tokens
-    }
-
-    fun getErrorResponse(): MutableLiveData<Response> {
-        return errorResponse
-    }
-
-    fun getUser(): MutableLiveData<User> {
-        return loggedUser
+    fun checkUserData() {
+        val loggedUser = getLoggedUser()
+        loggedUser?.let {
+            userData.value = it
+        }
     }
 
     fun checkLogin(email: String, password: String) {
-
         disposable.add(
             loginService.login(email, password)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableSingleObserver<Token>() {
                     override fun onSuccess(res: Token) {
+                        saveTokens(res)
                         tokens.value = res
-
-                        val tokenLocal = DbToken(res.token, res.refreshToken)
-                        saveTokens(tokenLocal)
                     }
 
                     override fun onError(e: Throwable) {
@@ -83,9 +77,10 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    fun saveTokens(tokens: DbToken) {
+    fun saveTokens(value: Token) {
         deleteToken()
-        insertToken(tokens)
+        val tokenLocal = DbToken(value.token, value.refreshToken)
+        insertToken(tokenLocal)
     }
 
     fun getUserFromToken() {
@@ -144,18 +139,6 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
 
         delete()
         insert(dbUser)
-    }
-
-    fun getUserData(): MutableLiveData<DbUser> {
-        val loggedUser = getLoggedUser()
-        loggedUser?.let {
-            userData.value = it
-        }
-        return userData
-    }
-
-    fun getUser(userId: Long): DbUser? {
-        return database.userDao().getUser(userId)
     }
 
     fun getLoggedUser(): DbUser? {

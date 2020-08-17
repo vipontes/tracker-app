@@ -13,5 +13,5 @@ interface IRoute {
     fun postRoute(@Body data: RoutePost): Single<Route>
 
     @GET("routes/{userId}")
-    fun getRoutesByUser(@Path("userId") userId: Int): Single<List<Route>>
+    fun getRoutesByUser(@Path("userId") userId: Long): Single<List<Route>>
 }

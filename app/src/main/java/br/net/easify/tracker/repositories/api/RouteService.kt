@@ -34,7 +34,7 @@ class RouteService(application: Application) {
         return api.postRoute(data)
     }
 
-    fun getRoutesByUser(userId: Int): Single<List<Route>> {
+    fun getRoutesByUser(userId: Long): Single<List<Route>> {
         return api.getRoutesByUser(userId)
     }
 }
