@@ -16,8 +16,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.repositories.database.AppDatabase
-import br.net.easify.tracker.repositories.database.model.DbRoute
-import br.net.easify.tracker.repositories.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoutePath
 import br.net.easify.tracker.helpers.Constants
 import br.net.easify.tracker.helpers.Formatter
 import br.net.easify.tracker.helpers.SharedPreferencesHelper
@@ -92,7 +92,7 @@ class LocationService : Service(), LocationListener {
         return null
     }
 
-    private fun getCurrentRoute(): DbRoute? {
+    private fun getCurrentRoute(): SqliteRoute? {
         var routeId: Long = 0
         prefs.getCurrentRoute().let {
             if (it.isNotEmpty()) {
@@ -120,11 +120,11 @@ class LocationService : Service(), LocationListener {
                 it.longitude != previousLocation.longitude)
             ) {
                 val route = getCurrentRoute()
-                route?.let { value: DbRoute ->
+                route?.let { value: SqliteRoute ->
                     if (value.in_progress == 1) {
                         val currentTime = Formatter.currentDateTimeYMDAsString()
                         val routeId = value.user_route_id!!
-                        val path = DbRoutePath(null, routeId, it.latitude, it.longitude, it.altitude, currentTime)
+                        val path = SqliteRoutePath(null, routeId, it.latitude, it.longitude, it.altitude, currentTime)
                         database.routePathDao().insert(path)
                     }
                 }

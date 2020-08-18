@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.DbToken
 import br.net.easify.tracker.databinding.ActivityLoginBinding
 import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.LoginBody

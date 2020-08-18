@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.DbUser
+import br.net.easify.tracker.repositories.database.model.SqliteUser
 import br.net.easify.tracker.databinding.FragmentSettingsBinding
 import br.net.easify.tracker.helpers.CustomAlertDialog
 import br.net.easify.tracker.view.login.LoginActivity
@@ -21,10 +21,10 @@ import br.net.easify.tracker.viewmodel.SettingsViewModel
 class SettingsFragment : Fragment() {
     private lateinit var viewModel: SettingsViewModel
     private lateinit var dataBinding: FragmentSettingsBinding
-    private lateinit var userData: DbUser
+    private lateinit var userData: SqliteUser
     private var alertDialog: AlertDialog? = null
 
-    private val userDataObserver = Observer<DbUser> {
+    private val userDataObserver = Observer<SqliteUser> {
         if (it != null) {
             userData = it
             dataBinding.userData = userData

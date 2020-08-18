@@ -7,11 +7,8 @@ import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Response
-import br.net.easify.tracker.model.Token
-import br.net.easify.tracker.model.User
 import br.net.easify.tracker.repositories.UserRepository
-import br.net.easify.tracker.repositories.database.model.DbUser
-import io.reactivex.disposables.CompositeDisposable
+import br.net.easify.tracker.repositories.database.model.SqliteUser
 import javax.inject.Inject
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
@@ -38,7 +35,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getUserFromToken() = userRepository.getUserFromToken()
 
-    fun getLoggedUser(): DbUser? {
+    fun getLoggedUser(): SqliteUser? {
         return userRepository.getLoggedUser()
     }
 

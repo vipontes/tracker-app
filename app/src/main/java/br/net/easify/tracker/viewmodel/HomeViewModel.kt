@@ -11,23 +11,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.api.RouteService
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.background.services.TimerService
-import br.net.easify.tracker.repositories.database.model.DbRoute
-import br.net.easify.tracker.repositories.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoutePath
 import br.net.easify.tracker.enums.TrackerActivityState
 import br.net.easify.tracker.helpers.*
 import br.net.easify.tracker.model.*
 import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.observers.DisposableSingleObserver
-import io.reactivex.schedulers.Schedulers
 import org.osmdroid.util.GeoPoint
-import retrofit2.HttpException
 import javax.inject.Inject
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -65,7 +59,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         override fun onReceive(context: Context, intent: Intent) {
             val resultCode = intent.getIntExtra(Constants.resultCode, Activity.RESULT_CANCELED)
             if (resultCode == Activity.RESULT_OK) {
-                val route = routeRepository.trackerRoute.value as DbRoute
+                val route = routeRepository.trackerRoute.value as SqliteRoute
                 route.let {
                     val elapsedTime = intent.getLongExtra(Constants.elapsedTime, 0)
                     val displayData = Formatter.hmsTimeFormatter(elapsedTime)
@@ -190,7 +184,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 if (routeId > 0) {
                     route.user_route_id = routeId
                     routeRepository.update(route)
-                    val routePath = DbRoutePath(null, routeId, pt.latitude, pt.longitude, pt.altitude, databaseFieldTime)
+                    val routePath = SqliteRoutePath(null, routeId, pt.latitude, pt.longitude, pt.altitude, databaseFieldTime)
                     routePathRepository.insert(routePath)
                     prefs.setCurrentRoute(routeId.toString())
                     trackerActivityState.value = TrackerActivityState.started
@@ -209,8 +203,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         description: String,
         databaseFieldTime: String,
         inProgress: Int
-    ): DbRoute {
-        return DbRoute(
+    ): SqliteRoute {
+        return SqliteRoute(
             null,
             userId,
             getApplication<Application>().resources.getString(R.string.default_duration),
@@ -242,20 +236,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
-
-    private fun sendNotificationToHomeFragment(route: DbRoute) {
+    private fun sendNotificationToHomeFragment(route: SqliteRoute) {
         prefs.removeCurrentRoute()
         trackerActivityState.value = TrackerActivityState.idle
         routeRepository.trackerRoute.value = createEmptyRoute(0, "", "", 0)
     }
 
-    private fun finishTrackerActivity(route: DbRoute, stopDatetime: String) {
+    private fun finishTrackerActivity(route: SqliteRoute, stopDatetime: String) {
         route.in_progress = 0
         routeRepository.update(route)
     }
 
-    private fun finishUserRoute(route: DbRoute, stopDatetime: String): Boolean {
+    private fun finishUserRoute(route: SqliteRoute, stopDatetime: String): Boolean {
         route.user_route_end_time = stopDatetime
         return routeRepository.update(route) > 0
     }
@@ -264,7 +256,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return trackerActivityState.value
     }
 
-    private fun getCurrentRoute(): DbRoute? {
+    private fun getCurrentRoute(): SqliteRoute? {
         var routeId: Long = 0
         prefs.getCurrentRoute().let {
             if (it.isNotEmpty()) {

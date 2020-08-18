@@ -5,12 +5,12 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.databinding.HolderRouteBinding
 
-class RouteHistoryAdapter(private var routes: ArrayList<DbRoute>): RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {
+class RouteHistoryAdapter(private var routes: ArrayList<SqliteRoute>): RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {
 
-    fun updateRoutes(newRoutes: List<DbRoute>) {
+    fun updateRoutes(newRoutes: List<SqliteRoute>) {
         routes.clear()
         routes.addAll(newRoutes)
         notifyDataSetChanged()

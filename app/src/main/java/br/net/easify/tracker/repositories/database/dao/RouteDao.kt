@@ -1,19 +1,19 @@
 package br.net.easify.tracker.repositories.database.dao
 
 import androidx.room.*
-import br.net.easify.tracker.repositories.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
 
 @Dao
 interface RouteDao {
 
     @Query("SELECT * FROM user_route WHERE user_route_id = :userRouteId")
-    fun getRoute(userRouteId: Long): DbRoute?
+    fun getRoute(userRouteId: Long): SqliteRoute?
 
     @Query("SELECT * FROM user_route ORDER BY user_route_id DESC")
-    fun getAll(): List<DbRoute>?
+    fun getAll(): List<SqliteRoute>?
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    fun insert(dbRoute: DbRoute): Long
+    fun insert(sqliteRoute: SqliteRoute): Long
 
     @Query("DELETE FROM user_route WHERE user_route_id = :userRouteId")
     fun delete(userRouteId: Long)
@@ -22,5 +22,5 @@ interface RouteDao {
     fun delete()
 
     @Update
-    fun update(dbRoute: DbRoute): Int
+    fun update(sqliteRoute: SqliteRoute): Int
 }

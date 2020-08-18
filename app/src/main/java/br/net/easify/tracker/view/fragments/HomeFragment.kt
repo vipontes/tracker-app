@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.databinding.FragmentHomeBinding
 import br.net.easify.tracker.enums.TrackerActivityState
 import br.net.easify.tracker.helpers.CustomAlertDialog
@@ -31,7 +31,7 @@ class HomeFragment : Fragment() {
     private lateinit var viewModel: HomeViewModel
     private lateinit var mapController: MapController
     private lateinit var dataBinding: FragmentHomeBinding
-    private lateinit var trackerActivity: DbRoute
+    private lateinit var trackerActivity: SqliteRoute
     private var alertDialog: AlertDialog? = null
     private var currentLocation: GeoPoint? = null
 
@@ -72,7 +72,7 @@ class HomeFragment : Fragment() {
         Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
     }
 
-    private val trackerActivityObserver = Observer<DbRoute> {
+    private val trackerActivityObserver = Observer<SqliteRoute> {
         trackerActivity = it
         dataBinding.trackerActivity = trackerActivity
     }

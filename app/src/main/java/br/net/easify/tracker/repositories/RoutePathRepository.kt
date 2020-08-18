@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.repositories.database.AppDatabase
-import br.net.easify.tracker.repositories.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.SqliteRoutePath
 import javax.inject.Inject
 
 class RoutePathRepository (application: Application) : AndroidViewModel(application) {
@@ -16,15 +16,15 @@ class RoutePathRepository (application: Application) : AndroidViewModel(applicat
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
     }
 
-    fun getRoutePath(userRoutePathId: Long): DbRoutePath? = database.routePathDao().getRoutePath(userRoutePathId)
+    fun getRoutePath(userRoutePathId: Long): SqliteRoutePath? = database.routePathDao().getRoutePath(userRoutePathId)
 
-    fun getPathFromRoute(userRouteId: Long): List<DbRoutePath> = database.routePathDao().getPathFromRoute(userRouteId)
+    fun getPathFromRoute(userRouteId: Long): List<SqliteRoutePath> = database.routePathDao().getPathFromRoute(userRouteId)
 
-    fun insert(dbRoutePath: DbRoutePath): Long = database.routePathDao().insert(dbRoutePath)
+    fun insert(sqliteRoutePath: SqliteRoutePath): Long = database.routePathDao().insert(sqliteRoutePath)
 
     fun delete(userRoutePathId: Long) = database.routePathDao().delete(userRoutePathId)
 
     fun delete() = database.routePathDao().delete()
 
-    fun update(dbRoutePath: DbRoutePath) = database.routePathDao().update(dbRoutePath)
+    fun update(sqliteRoutePath: SqliteRoutePath) = database.routePathDao().update(sqliteRoutePath)
 }

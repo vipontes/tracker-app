@@ -6,7 +6,7 @@
     <data>
         <variable
             name="trackerActivity"
-            type="br.net.easify.tracker.repositories.database.model.DbRoute" />
+            type="br.net.easify.tracker.repositories.database.model.SqliteRoute" />
     </data>
 
     <LinearLayout

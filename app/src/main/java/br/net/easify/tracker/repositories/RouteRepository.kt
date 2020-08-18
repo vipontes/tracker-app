@@ -3,7 +3,6 @@ package br.net.easify.tracker.repositories
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.model.Response
@@ -12,7 +11,7 @@ import br.net.easify.tracker.model.RoutePathPost
 import br.net.easify.tracker.model.RoutePost
 import br.net.easify.tracker.repositories.api.RouteService
 import br.net.easify.tracker.repositories.database.AppDatabase
-import br.net.easify.tracker.repositories.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
@@ -23,9 +22,9 @@ import javax.inject.Inject
 class RouteRepository (application: Application) : AndroidViewModel(application) {
     private val disposable = CompositeDisposable()
 
-    val trackerRoute by lazy { MutableLiveData<DbRoute>() }
+    val trackerRoute by lazy { MutableLiveData<SqliteRoute>() }
     val toastMessage by lazy { MutableLiveData<Response>() }
-    val routes by lazy { MutableLiveData<List<DbRoute>>() }
+    val routes by lazy { MutableLiveData<List<SqliteRoute>>() }
 
     private var routeService = RouteService(application)
 
@@ -36,7 +35,7 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
     }
 
-    fun synchronizeTrackingActivity(route: DbRoute) {
+    fun synchronizeTrackingActivity(route: SqliteRoute) {
         val userId = database.userDao().getLoggedUser()?.user_Id!!
         val data = getRoutePost(route, userId)
 
@@ -72,8 +71,7 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
         )
     }
 
-
-    private fun getRoutePost(route: DbRoute, userId: Long): RoutePost {
+    private fun getRoutePost(route: SqliteRoute, userId: Long): RoutePost {
         val path = database.routePathDao().getPathFromRoute(route.user_route_id!!)!!
 
         val routePath = arrayListOf<RoutePathPost>()
@@ -103,11 +101,11 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
         )
     }
 
-    fun getRoute(userRouteId: Long): DbRoute? = database.routeDao().getRoute(userRouteId)
+    fun getRoute(userRouteId: Long): SqliteRoute? = database.routeDao().getRoute(userRouteId)
 
     fun getAll() {
         var localRoutes = database.routeDao().getAll()
-        if (localRoutes != null && localRoutes.size > 0) {
+        if (localRoutes != null && localRoutes.isNotEmpty()) {
             routes.value = localRoutes
         } else {
             val userId = database.userDao().getLoggedUser()?.user_Id!!
@@ -118,23 +116,9 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
                     .subscribeWith(object : DisposableSingleObserver<List<Route>>() {
                         override fun onSuccess(res: List<Route>) {
 
-                            var routesFromApi: ArrayList<DbRoute> = arrayListOf()
+                            var routesFromApi: ArrayList<SqliteRoute> = arrayListOf()
                             for (item in res) {
-                                val route = DbRoute(
-                                    item.userRouteId,
-                                    item.userId,
-                                    item.userRouteDuration,
-                                    item.userRouteDistance,
-                                    item.userRouteCalories,
-                                    item.userRouteRhythm,
-                                    item.userRouteSpeed,
-                                    item.userRouteDescription,
-                                    item.userRouteStartTime,
-                                    item.userRouteEndTime,
-                                    0,
-                                    1
-                                )
-
+                                val route = SqliteRoute(0, 1).fromRoute(item)
                                 insert(route)
                                 routesFromApi.add(route)
                             }
@@ -163,13 +147,13 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun insert(dbRoute: DbRoute): Long = database.routeDao().insert(dbRoute)
+    fun insert(sqliteRoute: SqliteRoute): Long = database.routeDao().insert(sqliteRoute)
 
     fun delete(userRouteId: Long) = database.routeDao().delete(userRouteId)
 
     fun delete() = database.routeDao().delete()
 
-    fun update(dbRoute: DbRoute): Int = database.routeDao().update(dbRoute)
+    fun update(sqliteRoute: SqliteRoute): Int = database.routeDao().update(sqliteRoute)
 
     override fun onCleared() {
         super.onCleared()

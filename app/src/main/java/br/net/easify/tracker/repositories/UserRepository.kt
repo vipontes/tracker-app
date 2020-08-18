@@ -11,8 +11,8 @@ import br.net.easify.tracker.model.User
 import br.net.easify.tracker.repositories.api.LoginService
 import br.net.easify.tracker.repositories.api.UserService
 import br.net.easify.tracker.repositories.database.AppDatabase
-import br.net.easify.tracker.repositories.database.model.DbToken
-import br.net.easify.tracker.repositories.database.model.DbUser
+import br.net.easify.tracker.repositories.database.model.SqliteToken
+import br.net.easify.tracker.repositories.database.model.SqliteUser
 import com.auth0.android.jwt.JWT
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class UserRepository(application: Application) : AndroidViewModel(application) {
     private val disposable = CompositeDisposable()
 
-    var userData = MutableLiveData<DbUser>()
+    var userData = MutableLiveData<SqliteUser>()
     var tokens = MutableLiveData<Token>()
     var errorResponse = MutableLiveData<Response>()
     var loggedUser = MutableLiveData<User>()
@@ -79,14 +79,14 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
 
     fun saveTokens(value: Token) {
         deleteToken()
-        val tokenLocal = DbToken(value.token, value.refreshToken)
+        val tokenLocal = SqliteToken(value.token, value.refreshToken)
         insertToken(tokenLocal)
     }
 
     fun getUserFromToken() {
 
         val dbToken = getToken()
-        dbToken?.let { tokens: DbToken ->
+        dbToken?.let { tokens: SqliteToken ->
             val jwt = JWT(tokens.token)
             val userId = jwt.getClaim("userId").asInt()
             userId?.let { id: Int ->
@@ -124,29 +124,17 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
 
     fun saveLoggedUser(user: User) {
 
-        val dbUser = DbUser(
-            user.userId,
-            user.userName,
-            user.userEmail,
-            "",
-            user.userAvatar,
-            user.userActive,
-            user.userCreatedAt,
-            user.userWeight,
-            user.token,
-            user.refreshToken
-        )
-
+        val dbUser = SqliteUser().fromUser(user)
         delete()
         insert(dbUser)
     }
 
-    fun getLoggedUser(): DbUser? {
+    fun getLoggedUser(): SqliteUser? {
         return database.userDao().getLoggedUser()
     }
 
-    fun insert(dbUser: DbUser): Long {
-        return database.userDao().insert(dbUser)
+    fun insert(sqliteUser: SqliteUser): Long {
+        return database.userDao().insert(sqliteUser)
     }
 
     fun delete(userId: Long) = database.userDao().delete(userId)
@@ -164,11 +152,11 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
         userData.value = null
     }
 
-    fun update(dbUser: DbUser) = database.userDao().update(dbUser)
+    fun update(sqliteUser: SqliteUser) = database.userDao().update(sqliteUser)
 
-    fun getToken(): DbToken? = database.tokenDao().get()
+    fun getToken(): SqliteToken? = database.tokenDao().get()
 
-    fun insertToken(dbToken: DbToken) = database.tokenDao().insert(dbToken)
+    fun insertToken(sqliteToken: SqliteToken) = database.tokenDao().insert(sqliteToken)
 
     fun deleteToken() = database.tokenDao().delete()
 

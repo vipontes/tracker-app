@@ -7,7 +7,7 @@
     <data>
         <variable
             name="userData"
-            type="br.net.easify.tracker.repositories.database.model.DbUser" />
+            type="br.net.easify.tracker.repositories.database.model.SqliteUser" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -1,6 +1,6 @@
 package br.net.easify.tracker.helpers
 
-import br.net.easify.tracker.repositories.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.SqliteRoutePath
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.sqrt
@@ -8,7 +8,7 @@ import kotlin.math.sqrt
 class TrackerHelper {
     companion object {
 
-        fun calculateAverageRhythmInMilisecondsPerKilometer(path: List<DbRoutePath>): Double {
+        fun calculateAverageRhythmInMilisecondsPerKilometer(path: List<SqliteRoutePath>): Double {
             val averageSpeed = calculateAverageSpeedInKmPerHour(path)
             return calculateRhythmInMinutesPerKm(averageSpeed) * 60 * 1000
         }
@@ -18,7 +18,7 @@ class TrackerHelper {
             return (1 / (averageSpeed / 60))
         }
 
-        fun calculateAverageSpeedInKmPerHour(path: List<DbRoutePath>): Double {
+        fun calculateAverageSpeedInKmPerHour(path: List<SqliteRoutePath>): Double {
 
             if (path.size < 2)
                 return 0.0
@@ -35,7 +35,7 @@ class TrackerHelper {
             return convertMetersPerSecondsIntoKilometerPerHour(averageSpeedInMetersPerSeconds)
         }
 
-        fun calculateCalories(weigth: Int, path: List<DbRoutePath>): Double {
+        fun calculateCalories(weigth: Int, path: List<SqliteRoutePath>): Double {
 
             val speed = calculateAverageSpeedInKmPerHour(path)
 
@@ -49,11 +49,11 @@ class TrackerHelper {
             return caloriesPerMinute * (totalTime / 60)
         }
 
-        fun calculateDistanceInKilometers(path: List<DbRoutePath>): Double {
+        fun calculateDistanceInKilometers(path: List<SqliteRoutePath>): Double {
             return calculateDistanceInMeters(path) / 1000
         }
 
-        fun calculateDistanceInMeters(path: List<DbRoutePath>): Double {
+        fun calculateDistanceInMeters(path: List<SqliteRoutePath>): Double {
 
             if (path.size < 2)
                 return 0.0

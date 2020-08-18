@@ -1,6 +1,6 @@
 package br.net.easify.tracker
 
-import br.net.easify.tracker.repositories.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.SqliteRoutePath
 import br.net.easify.tracker.helpers.TrackerHelper
 import org.junit.Test
 
@@ -12,10 +12,10 @@ class TrackerUnitTest {
     @Test
     fun testSpeedCalculation() {
 
-        val path = arrayListOf<DbRoutePath>()
+        val path = arrayListOf<SqliteRoutePath>()
 
         path.add(
-            DbRoutePath(
+            SqliteRoutePath(
                 null,
                 1,
                 -25.4813728,
@@ -28,7 +28,7 @@ class TrackerUnitTest {
         assertEquals(0.0, speed, 0.001 )
 
         path.add(
-            DbRoutePath(
+            SqliteRoutePath(
                 null,
                 1,
                 -25.4813764,
@@ -45,10 +45,10 @@ class TrackerUnitTest {
     @Test
     fun testRhythmCalculation() {
 
-        val path = arrayListOf<DbRoutePath>()
+        val path = arrayListOf<SqliteRoutePath>()
 
         path.add(
-            DbRoutePath(
+            SqliteRoutePath(
                 null,
                 1,
                 -25.4813728,
@@ -61,7 +61,7 @@ class TrackerUnitTest {
         assertEquals(0.0, rhythm, 0.001 )
 
         path.add(
-            DbRoutePath(
+            SqliteRoutePath(
                 null,
                 1,
                 -25.4813764,

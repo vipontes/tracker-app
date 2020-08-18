@@ -17,8 +17,8 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import br.net.easify.tracker.R
 import br.net.easify.tracker.repositories.database.AppDatabase
-import br.net.easify.tracker.repositories.database.model.DbRoute
-import br.net.easify.tracker.repositories.database.model.DbRoutePath
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoutePath
 import br.net.easify.tracker.helpers.Constants
 import br.net.easify.tracker.helpers.Formatter
 import br.net.easify.tracker.helpers.SharedPreferencesHelper
@@ -134,7 +134,7 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
         return null
     }
 
-    private fun getCurrentRoute(): DbRoute? {
+    private fun getCurrentRoute(): SqliteRoute? {
         var routeId: Long = 0
         prefs.getCurrentRoute().let {
             if (it.isNotEmpty()) {
@@ -194,7 +194,7 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                 if (route.in_progress == 1) {
                     val currentTime = Formatter.currentDateTimeYMDAsString()
                     val routeId = route.user_route_id!!
-                    val path = DbRoutePath(null, routeId, lastLocation.latitude, lastLocation.longitude, lastLocation.altitude, currentTime)
+                    val path = SqliteRoutePath(null, routeId, lastLocation.latitude, lastLocation.longitude, lastLocation.altitude, currentTime)
                     database.routePathDao().insert(path)
                 }
             }

@@ -3,7 +3,7 @@ package br.net.easify.tracker.repositories.api.interceptor
 import android.app.Application
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.repositories.database.AppDatabase
-import br.net.easify.tracker.repositories.database.model.DbToken
+import br.net.easify.tracker.repositories.database.model.SqliteToken
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -15,7 +15,7 @@ class AuthInterceptor @Inject constructor(application: Application) : Intercepto
     @Inject
     lateinit var database: AppDatabase
 
-    private var tokens = DbToken("", "")
+    private var tokens = SqliteToken("", "")
 
     init {
         (application as MainApplication).getAppComponent()?.inject(this)

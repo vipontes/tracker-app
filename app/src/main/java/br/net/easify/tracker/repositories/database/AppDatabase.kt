@@ -9,10 +9,10 @@ import br.net.easify.tracker.repositories.database.model.*
 
 @Database(
     entities = [
-        DbUser::class,
-        DbToken::class,
-        DbRoute::class,
-        DbRoutePath::class
+        SqliteUser::class,
+        SqliteToken::class,
+        SqliteRoute::class,
+        SqliteRoutePath::class
     ],
     version = 1,
     exportSchema = false

@@ -4,10 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import br.net.easify.tracker.MainApplication
-import br.net.easify.tracker.repositories.database.model.DbRoute
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.helpers.Formatter
 import br.net.easify.tracker.repositories.RouteRepository
-import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
 class HistoryViewModel (application: Application) : AndroidViewModel(application) {
@@ -33,7 +32,7 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
         }
     }
 
-    private fun summarizeDistance(routes: List<DbRoute>): Double {
+    private fun summarizeDistance(routes: List<SqliteRoute>): Double {
         var distance = 0.0;
         for (item in routes) {
             item.user_route_distance?.let {
