@@ -24,17 +24,24 @@ class AuthInterceptor @Inject constructor(application: Application) : Intercepto
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response? {
         synchronized(this) {
-            val request: Request = chain.request()
+            val originalRequest: Request = chain.request()
 
             getToken()
 
-            val requestBuilder: Request.Builder = request.newBuilder()
+            val requestBuilder: Request.Builder = originalRequest.newBuilder()
 
-            if (request.header("No-Authentication") == null) {
+            if (originalRequest.header("No-Authentication") == null) {
                 if (tokens.token.isEmpty()) {
                     throw java.lang.RuntimeException("Token not found")
                 } else {
                     requestBuilder.addHeader("Authorization", "Bearer ${tokens.token}")
+                    val initialResponse = chain.proceed(requestBuilder.build())
+                    when {
+                        initialResponse.code() == 401 -> {
+
+                        }
+                        else -> return initialResponse
+                    }
                 }
             }
 
