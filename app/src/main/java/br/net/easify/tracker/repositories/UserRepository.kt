@@ -29,7 +29,7 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
     var errorResponse = MutableLiveData<Response>()
     var loggedUser = MutableLiveData<User>()
 
-    private var loginService = LoginService()
+    private var loginService = LoginService(application)
     private var userService = UserService(application)
 
     @Inject

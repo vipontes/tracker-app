@@ -2,15 +2,18 @@ package br.net.easify.tracker.repositories.api.interceptor
 
 import android.app.Application
 import br.net.easify.tracker.MainApplication
+import br.net.easify.tracker.repositories.api.LoginService
+import br.net.easify.tracker.repositories.api.RetrofitBuilder
 import br.net.easify.tracker.repositories.database.AppDatabase
 import br.net.easify.tracker.repositories.database.model.SqliteToken
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 import javax.inject.Inject
 
-class AuthInterceptor @Inject constructor(application: Application) : Interceptor {
+class AuthInterceptor @Inject constructor(application: Application, private val retrofitBuilder: RetrofitBuilder) : Interceptor {
 
     @Inject
     lateinit var database: AppDatabase
@@ -38,7 +41,30 @@ class AuthInterceptor @Inject constructor(application: Application) : Intercepto
                     val initialResponse = chain.proceed(requestBuilder.build())
                     when {
                         initialResponse.code() == 401 -> {
+                            val responseNewTokenLoginModel = runBlocking {
+                                retrofitBuilder.retrofit().create(LoginService::class.java).refreshToken(tokens.refresh_token).execute()
+                                }
 
+                            return when {
+                                responseNewTokenLoginModel == null || responseNewTokenLoginModel.code() != 200 -> {
+                                    return initialResponse
+                                }
+                                else -> {
+
+                                    responseNewTokenLoginModel.body()?.let {
+                                        tokens = SqliteToken().fromToken(it)
+                                        database.tokenDao().delete()
+                                        database.tokenDao().insert(tokens)
+                                    }
+
+                                    val newAuthenticationRequest =
+                                        originalRequest.newBuilder()
+                                            .addHeader("Authorization", "Bearer ${tokens.token}")
+                                            .build()
+
+                                    chain.proceed(newAuthenticationRequest)
+                                }
+                            }
                         }
                         else -> return initialResponse
                     }

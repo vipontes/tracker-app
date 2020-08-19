@@ -26,8 +26,8 @@ class TrackerHelper {
             val totalDistance = calculateDistanceInMeters(path)
 
             val totalTime = calculateElapsedTimeInSeconds(
-                path.first().user_route_path_datetime,
-                path.last().user_route_path_datetime
+                path.first().user_route_path_datetime!!,
+                path.last().user_route_path_datetime!!
             )
 
             val averageSpeedInMetersPerSeconds = totalDistance / totalTime
@@ -40,8 +40,8 @@ class TrackerHelper {
             val speed = calculateAverageSpeedInKmPerHour(path)
 
             val totalTime = calculateElapsedTimeInSeconds(
-                path.first().user_route_path_datetime,
-                path.last().user_route_path_datetime
+                path.first().user_route_path_datetime!!,
+                path.last().user_route_path_datetime!!
             )
 
             val caloriesPerMinute = weigth * speed * 0.0175
