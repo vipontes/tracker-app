@@ -160,14 +160,14 @@ class HomeFragment : Fragment() {
     }
 
     fun addMarker(center: GeoPoint) {
-        var marker = Marker(dataBinding.mapView)
+        val marker = Marker(dataBinding.mapView)
         marker.position = center
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         dataBinding.mapView.overlays.add(marker)
     }
 
     private fun drawPath(path: ArrayList<GeoPoint>) {
-        var polyline = Polyline(dataBinding.mapView, true, false)
+        val polyline = Polyline(dataBinding.mapView, true, false)
         polyline.setColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
         for (point in path) {
             polyline.addPoint(point)
