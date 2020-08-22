@@ -59,12 +59,15 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
                                 toastMessage.value =
                                     Response((getApplication() as MainApplication).getString(R.string.unauthorized))
                             } else {
-                                toastMessage.value =
-                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
+//                                toastMessage.value =
+//                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                toastMessage.value = Response(e.message())
                             }
                         } else {
-                            toastMessage.value =
-                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
+//                            toastMessage.value =
+////                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
+
+                                toastMessage.value = Response(e.toString())
                         }
                     }
                 })

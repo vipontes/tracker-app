@@ -59,7 +59,6 @@ class SettingsFragment : Fragment() {
         dataBinding.editProfileButton.setOnClickListener(View.OnClickListener {
 
             val dialog = UserDataDialog()
-            dialog.isCancelable = false
             dialog.allowEnterTransitionOverlap = false
             dialog.show(parentFragmentManager)
         })

@@ -1,6 +1,7 @@
 package br.net.easify.tracker.view.main
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
         setContentView(R.layout.activity_main)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         viewModel.startLocationService()

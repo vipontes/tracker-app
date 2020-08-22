@@ -2,8 +2,11 @@ package br.net.easify.tracker.repositories.api.interceptor
 
 import android.app.Application
 import br.net.easify.tracker.MainApplication
+import br.net.easify.tracker.R
+import br.net.easify.tracker.model.RefreshTokenBody
 import br.net.easify.tracker.repositories.api.LoginService
 import br.net.easify.tracker.repositories.api.RetrofitBuilder
+import br.net.easify.tracker.repositories.api.interfaces.ILogin
 import br.net.easify.tracker.repositories.database.AppDatabase
 import br.net.easify.tracker.repositories.database.model.SqliteToken
 import kotlinx.coroutines.runBlocking
@@ -13,7 +16,7 @@ import okhttp3.Response
 import java.io.IOException
 import javax.inject.Inject
 
-class AuthInterceptor @Inject constructor(application: Application, private val retrofitBuilder: RetrofitBuilder) : Interceptor {
+class AuthInterceptor @Inject constructor(var application: Application, private val retrofitBuilder: RetrofitBuilder) : Interceptor {
 
     @Inject
     lateinit var database: AppDatabase
@@ -35,14 +38,15 @@ class AuthInterceptor @Inject constructor(application: Application, private val 
 
             if (originalRequest.header("No-Authentication") == null) {
                 if (tokens.token.isEmpty()) {
-                    throw java.lang.RuntimeException("Token not found")
+                    throw java.lang.RuntimeException(application.getString(R.string.token_not_found))
                 } else {
                     requestBuilder.addHeader("Authorization", "Bearer ${tokens.token}")
                     val initialResponse = chain.proceed(requestBuilder.build())
                     when {
                         initialResponse.code() == 401 -> {
                             val responseNewTokenLoginModel = runBlocking {
-                                retrofitBuilder.retrofit().create(LoginService::class.java).refreshToken(tokens.refresh_token).execute()
+                                val body = RefreshTokenBody(tokens.refresh_token)
+                                retrofitBuilder.retrofit().create(ILogin::class.java).refreshToken(body).execute()
                                 }
 
                             return when {

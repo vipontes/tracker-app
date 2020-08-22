@@ -22,8 +22,4 @@ class LoginService (application: Application) {
         return api.login(body)
     }
 
-    fun refreshToken(refreshToken: String): Call<Token> {
-        val body = RefreshTokenBody(refreshToken)
-        return api.refreshToken(body)
-    }
 }

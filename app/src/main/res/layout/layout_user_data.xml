@@ -20,7 +20,7 @@
             android:orientation="vertical">
 
             <ImageButton
-                android:id="@+id/btInfo"
+                android:id="@+id/closeButton"
                 android:layout_width="30dp"
                 android:layout_height="35dp"
                 android:layout_gravity="right"
@@ -74,7 +74,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/startStopButton"
+                    android:id="@+id/saveButton"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_marginBottom="15dp"

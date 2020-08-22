@@ -17,5 +17,4 @@ interface ILogin {
     @POST("refresh-token")
     @Headers("No-Authentication: true")
     fun refreshToken(@Body data: RefreshTokenBody): Call<Token>
-
 }

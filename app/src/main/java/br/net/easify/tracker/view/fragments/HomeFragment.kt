@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -99,6 +100,8 @@ class HomeFragment : Fragment() {
         initializeMap()
         initializeStartStopButton()
         initializetakePictureButton()
+
+
     }
 
     private fun initializeStartStopButton() {

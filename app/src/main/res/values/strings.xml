@@ -57,5 +57,6 @@
     <string name="tracker_activity">Tracker Activity</string>
     <string name="logout">Logout</string>
     <string name="total">TOTAL</string>
+    <string name="token_not_found">Token not found</string>
 
 </resources>
