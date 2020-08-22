@@ -128,15 +128,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun startTrackerActivity() {
-        if (viewModel.startLocationService()) {
-            viewModel.startTracker()
-        }
+        viewModel.startLocationService()
+        viewModel.startTracker()
     }
 
     private fun stopTrackerActivity() {
-        if (viewModel.stopLocationService()) {
-            viewModel.stopTracker()
-        }
+        viewModel.stopLocationService()
+        viewModel.stopTracker()
     }
 
     private fun initializeMap() {
@@ -152,6 +150,8 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         dataBinding.mapView.onResume()
+        dataBinding.spinner.visibility = View.VISIBLE
+        viewModel.startLocationService()
     }
 
     override fun onPause() {

@@ -11,9 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.SqliteUser
 import br.net.easify.tracker.databinding.FragmentSettingsBinding
 import br.net.easify.tracker.helpers.CustomAlertDialog
+import br.net.easify.tracker.repositories.database.model.SqliteUser
+import br.net.easify.tracker.view.dialogs.UserDataDialog
 import br.net.easify.tracker.view.login.LoginActivity
 import br.net.easify.tracker.viewmodel.SettingsViewModel
 
@@ -57,6 +58,10 @@ class SettingsFragment : Fragment() {
     private fun initializeButtons() {
         dataBinding.editProfileButton.setOnClickListener(View.OnClickListener {
 
+            val dialog = UserDataDialog()
+            dialog.isCancelable = false
+            dialog.allowEnterTransitionOverlap = false
+            dialog.show(parentFragmentManager)
         })
 
         dataBinding.logout.setOnClickListener(View.OnClickListener {

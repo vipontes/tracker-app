@@ -132,25 +132,20 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun startLocationService(): Boolean {
+    fun startLocationService() {
         val gpsService = LocationService()
         val gpsIntent = Intent(getApplication(), gpsService::class.java)
         if (!serviceHelper.isMyServiceRunning(gpsService::class.java)) {
             (getApplication() as MainApplication).startService(gpsIntent)
         }
-
-        return true
     }
 
-    fun stopLocationService(): Boolean {
+    fun stopLocationService() {
         val gpsService = LocationService()
         val gpsIntent = Intent(getApplication(), gpsService::class.java)
         if (serviceHelper.isMyServiceRunning(gpsService::class.java)) {
             (getApplication() as MainApplication).stopService(gpsIntent)
-            return true
         }
-
-        return true
     }
 
     private fun startTimerService() {
