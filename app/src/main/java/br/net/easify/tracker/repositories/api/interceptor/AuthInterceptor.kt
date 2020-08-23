@@ -54,7 +54,6 @@ class AuthInterceptor @Inject constructor(var application: Application, private 
                                     return initialResponse
                                 }
                                 else -> {
-
                                     responseNewTokenLoginModel.body()?.let {
                                         tokens = SqliteToken().fromToken(it)
                                         database.tokenDao().delete()

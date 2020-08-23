@@ -2,7 +2,7 @@
     <string name="app_name">Tracker</string>
 
     <string name="login">Login</string>
-    <string name="login_email_hint">Email</string>
+    <string name="login_email_hint">E-mail</string>
     <string name="login_password_hint">Password</string>
 
     <string name="empty_email">Invalid E-mail</string>
@@ -58,5 +58,9 @@
     <string name="logout">Logout</string>
     <string name="total">TOTAL</string>
     <string name="token_not_found">Token not found</string>
+    <string name="height_in_cm">Height in cm</string>
+    <string name="weight_in_kg">Weight in kg</string>
+    <string name="name">Name</string>
+    <string name="save">Save</string>
 
 </resources>

@@ -1,14 +1,26 @@
 package br.net.easify.tracker.view.adapters
 
+import android.app.Application
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.databinding.HolderRouteBinding
+import br.net.easify.tracker.repositories.RouteRepository
+import javax.inject.Inject
 
-class RouteHistoryAdapter(private var routes: ArrayList<SqliteRoute>): RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {
+class RouteHistoryAdapter(private var application: Application, private var routes: ArrayList<SqliteRoute>): RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {
+
+    @Inject
+    lateinit var routeRepository: RouteRepository
+
+    init {
+        (application as MainApplication).getAppComponent()?.inject(this)
+    }
 
     fun updateRoutes(newRoutes: List<SqliteRoute>) {
         routes.clear()
@@ -23,7 +35,18 @@ class RouteHistoryAdapter(private var routes: ArrayList<SqliteRoute>): RecyclerV
     }
 
     override fun onBindViewHolder(holder: RouteViewHolder, position: Int) {
-        holder.view.route = routes[position]
+
+        var route = routes[position]
+
+        if ( route.sync == 0 && route.in_progress == 0 ) {
+            holder.view.refreshButton.visibility = View.VISIBLE
+
+            holder.view.refreshButton.setOnClickListener(View.OnClickListener {
+                routeRepository.synchronizeTrackingActivity(route)
+            })
+        }
+
+        holder.view.route = route
     }
 
     override fun getItemCount() = routes.size

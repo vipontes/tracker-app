@@ -65,8 +65,7 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
                             }
                         } else {
 //                            toastMessage.value =
-////                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
-
+//                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
                                 toastMessage.value = Response(e.toString())
                         }
                     }

@@ -36,7 +36,7 @@ data class SqliteUser(
         this.user_Id = user.userId
         this.user_name = user.userName
         this.user_email = user.userEmail
-        this.user_password = user.userPassword
+        this.user_password = ""
         this.user_avatar = user.userAvatar
         this.user_active = user.userActive
         this.user_created_at = user.userCreatedAt

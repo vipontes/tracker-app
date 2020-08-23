@@ -18,7 +18,7 @@ import br.net.easify.tracker.viewmodel.HistoryViewModel
 class HistoryFragment : Fragment() {
     private lateinit var viewModel: HistoryViewModel
     private lateinit var dataBinding: FragmentHistoryBinding
-    private val routesAdapter = RouteHistoryAdapter(arrayListOf())
+    private lateinit var routesAdapter: RouteHistoryAdapter
 
     private val routesObserver = Observer<List<SqliteRoute>> { list ->
         list?.let {
@@ -47,7 +47,7 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        routesAdapter = RouteHistoryAdapter(requireActivity().application, arrayListOf())
         dataBinding.routesHistory.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = routesAdapter

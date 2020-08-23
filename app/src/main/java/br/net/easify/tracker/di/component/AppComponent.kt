@@ -7,6 +7,7 @@ import br.net.easify.tracker.di.module.*
 import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
+import br.net.easify.tracker.view.adapters.RouteHistoryAdapter
 import br.net.easify.tracker.viewmodel.*
 import dagger.Component
 import javax.inject.Singleton
@@ -32,6 +33,7 @@ interface AppComponent {
     fun inject(viewModel: HomeViewModel)
     fun inject(viewModel: HistoryViewModel)
     fun inject(viewModel: SettingsViewModel)
+    fun inject(viewModel: UserDataViewModel)
 
     fun inject(locationService: LocationService)
     fun inject(interceptor: AuthInterceptor)
@@ -39,4 +41,7 @@ interface AppComponent {
     fun inject(repository: UserRepository)
     fun inject(repository: RouteRepository)
     fun inject(repository: RoutePathRepository)
+
+    fun inject(adapter: RouteHistoryAdapter)
+
 }
