@@ -43,5 +43,4 @@ interface AppComponent {
     fun inject(repository: RoutePathRepository)
 
     fun inject(adapter: RouteHistoryAdapter)
-
 }

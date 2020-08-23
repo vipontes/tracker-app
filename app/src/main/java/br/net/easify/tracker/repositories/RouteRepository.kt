@@ -61,12 +61,12 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
                             } else {
 //                                toastMessage.value =
 //                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
-                                toastMessage.value = Response(e.message())
+                                toastMessage.value = Response(false, e.message())
                             }
                         } else {
 //                            toastMessage.value =
 //                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
-                                toastMessage.value = Response(e.toString())
+                                toastMessage.value = Response(false, e.toString())
                         }
                     }
                 })
@@ -134,14 +134,14 @@ class RouteRepository (application: Application) : AndroidViewModel(application)
                             if (e is HttpException) {
                                 if (e.code() == 401) {
                                     toastMessage.value =
-                                        Response((getApplication() as MainApplication).getString(R.string.unauthorized))
+                                        Response(false, (getApplication() as MainApplication).getString(R.string.unauthorized))
                                 } else {
                                     toastMessage.value =
-                                        Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                        Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
                                 }
                             } else {
                                 toastMessage.value =
-                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                    Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
                             }
                         }
                     })

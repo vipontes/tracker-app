@@ -21,7 +21,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
-        userRepository.checkUserData()
+        userRepository.getLoggedUser()
         loginBody.value = LoginBody("", "")
     }
 

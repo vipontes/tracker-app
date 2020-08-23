@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class User(
-    var userId: Long,
+    var userId: Long?,
     var userName: String?,
     var userEmail: String?,
     var userPassword: String?,
@@ -16,7 +16,7 @@ data class User(
     var refreshToken: String?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readLong(),
+        parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
@@ -30,7 +30,7 @@ data class User(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(userId)
+        parcel.writeValue(userId)
         parcel.writeString(userName)
         parcel.writeString(userEmail)
         parcel.writeString(userPassword)

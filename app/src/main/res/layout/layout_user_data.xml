@@ -55,8 +55,7 @@
                         android:layout_marginBottom="12dp"
                         android:hint="@string/name"
                         android:inputType="textCapWords"
-                        android:maxLength="14"
-                        android:text="@{userData.user_name}" />
+                        android:text="@={userData.user_name}" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -71,9 +70,7 @@
                         android:layout_marginBottom="12dp"
                         android:hint="@string/login_email_hint"
                         android:inputType="textEmailAddress"
-                        android:maxLength="60"
-                        android:maxLines="1"
-                        android:text="@{userData.user_email}" />
+                        android:text="@={userData.user_email}" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -88,9 +85,7 @@
                         android:layout_marginBottom="12dp"
                         android:hint="@string/weight_in_kg"
                         android:inputType="number"
-                        android:maxLength="60"
-                        android:maxLines="1"
-                        android:text="@{Integer.toString(userData.user_weight)}" />
+                        android:text="@={`` + userData.user_weight}" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -111,8 +106,7 @@
                             android:layout_marginBottom="12dp"
                             android:hint="@string/login_password_hint"
                             android:inputType="textNoSuggestions|textPassword"
-                            android:maxLines="1"
-                            android:text="@{userData.user_password}" />
+                            android:text="@={userData.user_password}" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.button.MaterialButton

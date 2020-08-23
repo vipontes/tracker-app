@@ -19,5 +19,5 @@ interface UserDao {
     fun delete()
 
     @Update
-    fun update(sqliteUser: SqliteUser?)
+    fun update(sqliteUser: SqliteUser?): Int
 }

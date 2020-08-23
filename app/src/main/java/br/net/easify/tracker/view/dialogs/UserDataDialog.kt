@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
@@ -13,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
 import br.net.easify.tracker.databinding.LayoutUserDataBinding
+import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.repositories.database.model.SqliteUser
 import br.net.easify.tracker.viewmodel.UserDataViewModel
 
@@ -27,6 +29,15 @@ class UserDataDialog : DialogFragment() {
         dataBinding.userData = it
     }
 
+    private val errorMessageObserver = Observer<Response> { error: Response ->
+        error.let {
+            Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+            if ( it.success ) {
+                theDialog.dismiss()
+            }
+        }
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         dataBinding =
@@ -39,7 +50,9 @@ class UserDataDialog : DialogFragment() {
         isCancelable = false
 
         viewModel = ViewModelProviders.of(this).get(UserDataViewModel::class.java)
-        viewModel.userData.observe(this, userObserver)
+        viewModel.userRepository.userData.observe(this, userObserver)
+        viewModel.userRepository.errorResponse.observe(this, errorMessageObserver)
+
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(
             ContextThemeWrapper(activity, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen)
@@ -49,7 +62,9 @@ class UserDataDialog : DialogFragment() {
         theDialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
 
         dataBinding.saveButton.setOnClickListener(View.OnClickListener {
-            theDialog.dismiss()
+            dataBinding.userData?.let {
+                viewModel.update(it)
+            }
         })
 
         dataBinding.closeButton.setOnClickListener(View.OnClickListener {

@@ -8,6 +8,7 @@
     <string name="empty_email">Invalid E-mail</string>
     <string name="empty_password">Invalid Password</string>
     <string name="internal_error">Internal Error</string>
+    <string name="user_update_error">Couldn\'t update user data</string>
     <string name="unauthorized">Unauthorized</string>
     <string name="menu_home">Home</string>
     <string name="menu_history">History</string>

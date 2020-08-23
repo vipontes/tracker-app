@@ -13,7 +13,7 @@ class SettingsViewModel (application: Application) : AndroidViewModel(applicatio
 
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
-        userRepository.checkUserData()
+        userRepository.getLoggedUser()
     }
 
     fun logout() {

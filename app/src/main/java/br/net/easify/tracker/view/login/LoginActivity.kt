@@ -81,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
 
-        if  (viewModel.getLoggedUser() != null) {
+        if (viewModel.getLoggedUser() != null) {
             startMainActivity()
             return
         }

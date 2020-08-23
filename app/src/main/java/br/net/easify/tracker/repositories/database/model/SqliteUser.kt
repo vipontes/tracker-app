@@ -2,6 +2,7 @@ package br.net.easify.tracker.repositories.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import br.net.easify.tracker.model.Route
 import br.net.easify.tracker.model.User
 
 @Entity(tableName = "user")
@@ -31,6 +32,22 @@ data class SqliteUser(
         "",
         ""
     )
+
+    fun toUser(): User {
+
+        return User(
+            this.user_Id,
+            this.user_name,
+            this.user_email,
+            this.user_password,
+            this.user_active,
+            this.user_avatar,
+            this.user_created_at,
+            this.user_weight,
+            this.token,
+            this.refresh_token
+        )
+    }
 
     fun fromUser(user: User): SqliteUser {
         this.user_Id = user.userId

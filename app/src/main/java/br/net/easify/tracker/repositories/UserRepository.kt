@@ -39,13 +39,6 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
     }
 
-    fun checkUserData() {
-        val loggedUser = getLoggedUser()
-        loggedUser?.let {
-            userData.value = it
-        }
-    }
-
     fun checkLogin(email: String, password: String) {
         disposable.add(
             loginService.login(email, password)
@@ -63,14 +56,14 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
                         if (e is HttpException) {
                             if (e.code() == 401) {
                                 errorResponse.value =
-                                    Response((getApplication() as MainApplication).getString(R.string.unauthorized))
+                                    Response(false, (getApplication() as MainApplication).getString(R.string.unauthorized))
                             } else {
                                 errorResponse.value =
-                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                    Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
                             }
                         } else {
                             errorResponse.value =
-                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
                         }
                     }
                 })
@@ -106,14 +99,14 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
                                 if (e is HttpException) {
                                     if (e.code() == 401) {
                                         errorResponse.value =
-                                            Response((getApplication() as MainApplication).getString(R.string.unauthorized))
+                                            Response(false, (getApplication() as MainApplication).getString(R.string.unauthorized))
                                     } else {
                                         errorResponse.value =
-                                            Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                            Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
                                     }
                                 } else {
                                     errorResponse.value =
-                                        Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                        Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
                                 }
                             }
                         })
@@ -123,14 +116,15 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
     }
 
     fun saveLoggedUser(user: User) {
-
         val dbUser = SqliteUser().fromUser(user)
         delete()
         insert(dbUser)
     }
 
     fun getLoggedUser(): SqliteUser? {
-        return database.userDao().getLoggedUser()
+        val user = database.userDao().getLoggedUser()
+        userData.value = user
+        return user
     }
 
     fun insert(sqliteUser: SqliteUser): Long {
@@ -152,7 +146,41 @@ class UserRepository(application: Application) : AndroidViewModel(application) {
         userData.value = null
     }
 
-    fun update(sqliteUser: SqliteUser) = database.userDao().update(sqliteUser)
+    fun update(sqliteUser: SqliteUser) {
+        val updatedRecordCount = database.userDao().update(sqliteUser)
+        if ( updatedRecordCount == 1 ) {
+            val user = sqliteUser.toUser()
+            disposable.add(
+                userService.update(user)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(object : DisposableSingleObserver<Response>() {
+                        override fun onSuccess(res: Response) {
+                            errorResponse.value = Response("")
+                        }
+
+                        override fun onError(e: Throwable) {
+                            e.printStackTrace()
+
+                            if (e is HttpException) {
+                                if (e.code() == 401) {
+                                    errorResponse.value =
+                                        Response(false, (getApplication() as MainApplication).getString(R.string.unauthorized))
+                                } else {
+                                    errorResponse.value =
+                                        Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
+                                }
+                            } else {
+                                errorResponse.value =
+                                    Response(false, (getApplication() as MainApplication).getString(R.string.internal_error))
+                            }
+                        }
+                    })
+            )
+        } else {
+            errorResponse.value = Response(false, (getApplication() as MainApplication).getString(R.string.user_update_error))
+        }
+    }
 
     fun getToken(): SqliteToken? = database.tokenDao().get()
 
