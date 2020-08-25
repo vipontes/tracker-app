@@ -13,7 +13,11 @@ import br.net.easify.tracker.databinding.HolderRouteBinding
 import br.net.easify.tracker.repositories.RouteRepository
 import javax.inject.Inject
 
-class RouteHistoryAdapter(private var application: Application, private var routes: ArrayList<SqliteRoute>): RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {
+class RouteHistoryAdapter(
+    application: Application,
+    private var routes: ArrayList<SqliteRoute>,
+    private var listener: OnItemClick
+) : RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {
 
     @Inject
     lateinit var routeRepository: RouteRepository
@@ -28,9 +32,21 @@ class RouteHistoryAdapter(private var application: Application, private var rout
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
+    interface OnItemClick {
+        fun onItemClick(route: SqliteRoute)
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RouteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = DataBindingUtil.inflate<HolderRouteBinding>(inflater, R.layout.holder_route, parent, false)
+        val view = DataBindingUtil.inflate<HolderRouteBinding>(
+            inflater,
+            R.layout.holder_route,
+            parent,
+            false
+        )
         return RouteViewHolder(view)
     }
 
@@ -38,18 +54,23 @@ class RouteHistoryAdapter(private var application: Application, private var rout
 
         var route = routes[position]
 
-        if ( route.sync == 0 && route.in_progress == 0 ) {
+        if (route.sync == 0 && route.in_progress == 0) {
             holder.view.refreshButton.visibility = View.VISIBLE
 
-//            holder.view.refreshButton.setOnClickListener(View.OnClickListener {
+            holder.view.refreshButton.setOnClickListener(View.OnClickListener {
 //                routeRepository.synchronizeTrackingActivity(route)
-//            })
+            })
         }
+
+        holder.itemView.setOnClickListener(View.OnClickListener {
+            listener.onItemClick(route)
+        })
 
         holder.view.route = route
     }
 
     override fun getItemCount() = routes.size
 
-    class RouteViewHolder(var view: HolderRouteBinding): RecyclerView.ViewHolder(view.root)
+    class RouteViewHolder(var view: HolderRouteBinding) :
+        RecyclerView.ViewHolder(view.root)
 }

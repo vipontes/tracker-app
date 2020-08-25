@@ -34,6 +34,7 @@ interface AppComponent {
     fun inject(viewModel: HistoryViewModel)
     fun inject(viewModel: SettingsViewModel)
     fun inject(viewModel: UserDataViewModel)
+    fun inject(viewModel: RouteViewModel)
 
     fun inject(locationService: LocationService)
     fun inject(interceptor: AuthInterceptor)

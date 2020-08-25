@@ -1,5 +1,6 @@
 package br.net.easify.tracker.view.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +14,11 @@ import br.net.easify.tracker.R
 import br.net.easify.tracker.databinding.FragmentHistoryBinding
 import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.view.adapters.RouteHistoryAdapter
+import br.net.easify.tracker.view.route.RouteActivity
 import br.net.easify.tracker.viewmodel.HistoryViewModel
+import kotlinx.android.synthetic.main.fragment_settings.*
 
-class HistoryFragment : Fragment() {
+class HistoryFragment : Fragment(), RouteHistoryAdapter.OnItemClick {
     private lateinit var viewModel: HistoryViewModel
     private lateinit var dataBinding: FragmentHistoryBinding
     private lateinit var routesAdapter: RouteHistoryAdapter
@@ -60,11 +63,16 @@ class HistoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         routesAdapter =
-            RouteHistoryAdapter(requireActivity().application, arrayListOf())
+            RouteHistoryAdapter(requireActivity().application, arrayListOf(), this)
         dataBinding.routesHistory.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = routesAdapter
         }
+    }
+
+    override fun onItemClick(route: SqliteRoute) {
+        val intent = Intent(requireContext(), RouteActivity::class.java)
+        startActivity(intent)
     }
 
 }
