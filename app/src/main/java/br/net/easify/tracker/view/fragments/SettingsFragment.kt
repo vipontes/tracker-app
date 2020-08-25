@@ -19,7 +19,7 @@ import br.net.easify.tracker.view.login.LoginActivity
 import br.net.easify.tracker.viewmodel.SettingsViewModel
 
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : Fragment(), UserDataDialog.OnSaveListener {
     private lateinit var viewModel: SettingsViewModel
     private lateinit var dataBinding: FragmentSettingsBinding
     private lateinit var userData: SqliteUser
@@ -65,7 +65,7 @@ class SettingsFragment : Fragment() {
 
             val dialog = UserDataDialog()
             dialog.allowEnterTransitionOverlap = false
-            dialog.show(parentFragmentManager)
+            dialog.show(parentFragmentManager, this)
         })
 
         dataBinding.logout.setOnClickListener(View.OnClickListener {
@@ -93,5 +93,9 @@ class SettingsFragment : Fragment() {
                     Intent.FLAG_ACTIVITY_NEW_TASK
         activity?.startActivity(intent)
         activity?.finish()
+    }
+
+    override fun onSave() {
+        viewModel.getLoggedUser()
     }
 }

@@ -14,7 +14,6 @@ import br.net.easify.tracker.databinding.ActivityLoginBinding
 import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
-import br.net.easify.tracker.model.User
 import br.net.easify.tracker.repositories.database.model.SqliteUser
 import br.net.easify.tracker.view.main.MainActivity
 import br.net.easify.tracker.viewmodel.LoginViewModel
@@ -85,10 +84,6 @@ class LoginActivity : AppCompatActivity() {
             }).check()
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-        viewModel.loginBody.observe(this, loginObserver)
-        viewModel.userData.observe(this, userObserver)
-        viewModel.tokens.observe(this, tokensObserver)
-        viewModel.errorResponse.observe(this, errorMessageObserver)
 
         dataBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_login)
@@ -100,6 +95,11 @@ class LoginActivity : AppCompatActivity() {
                 viewModel.login()
             }
         })
+
+        viewModel.loginBody.observe(this, loginObserver)
+        viewModel.userData.observe(this, userObserver)
+        viewModel.tokens.observe(this, tokensObserver)
+        viewModel.errorResponse.observe(this, errorMessageObserver)
     }
 
     private fun startMainActivity() {

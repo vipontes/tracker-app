@@ -27,13 +27,13 @@ class SettingsViewModel (application: Application) : AndroidViewModel(applicatio
         userRepository.logout()
     }
 
+    override fun getLoggedUser() {
+        userData.value = userRepository.getLoggedUser()
+    }
+
     override fun onCleared() {
         super.onCleared()
 
         disposable.clear()
-    }
-
-    override fun getLoggedUser() {
-        userData.value = userRepository.getLoggedUser()
     }
 }

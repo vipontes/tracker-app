@@ -31,12 +31,20 @@ class UserDataDialog : DialogFragment() {
 
     private val errorMessageObserver = Observer<Response> { error: Response ->
         error.let {
-            Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
             if ( it.success ) {
                 theDialog.dismiss()
+                listener?.onSave()
+            } else {
+                Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
             }
         }
     }
+
+    interface OnSaveListener {
+        fun onSave()
+    }
+
+    var listener: OnSaveListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
@@ -45,17 +53,20 @@ class UserDataDialog : DialogFragment() {
                 LayoutInflater.from(context),
                 R.layout.layout_user_data,
                 null,
-                false)
-
-        isCancelable = false
+                false
+            )
 
         viewModel = ViewModelProviders.of(this).get(UserDataViewModel::class.java)
         viewModel.userData.observe(this, userObserver)
         viewModel.errorResponse.observe(this, errorMessageObserver)
 
+        viewModel.getLoggedUser()
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(
-            ContextThemeWrapper(activity, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen)
+            ContextThemeWrapper(
+                activity,
+                android.R.style.Theme_Translucent_NoTitleBar_Fullscreen
+            )
         ).setIcon(null).setView(dataBinding.root)
 
         theDialog = builder.create()
@@ -74,7 +85,8 @@ class UserDataDialog : DialogFragment() {
         return theDialog
     }
 
-    fun show(manager: FragmentManager) {
+    fun show(manager: FragmentManager, listener: OnSaveListener) {
+        this.listener = listener
         val ft = manager.beginTransaction()
         ft.add(this, this.javaClass.simpleName)
         ft.commitAllowingStateLoss()
