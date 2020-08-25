@@ -280,21 +280,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getCurrentTrackerPath() : ArrayList<GeoPoint> {
-        val path: ArrayList<GeoPoint> = arrayListOf()
+        var path: ArrayList<GeoPoint> = arrayListOf()
 
         val route = getCurrentRoute()
         route?.let {
             val routeId = route.user_route_id!!
             val routePath = routePathRepository.getPathFromRoute(routeId)
-            for (point in routePath) {
-                path.add(GeoPoint(point.user_route_path_lat, point.user_route_path_lng))
-            }
+            path = MapHelper().geoPointFromRoutePath(routePath)
         }
 
         return path
     }
 
-    fun synchronizeTrackingActivity(route: SqliteRoute) {
+    private fun synchronizeTrackingActivity(route: SqliteRoute) {
         val userId = userRepository.getLoggedUser()?.user_Id!!
         val data = routeRepository.getRoutePost(route, userId)
 
@@ -318,13 +316,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                                 toastMessage.value =
                                     Response((getApplication() as MainApplication).getString(R.string.unauthorized))
                             } else {
-//                                toastMessage.value =
-//                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
                                 toastMessage.value = Response(false, e.message())
                             }
                         } else {
-//                            toastMessage.value =
-//                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
                             toastMessage.value = Response(false, e.toString())
                         }
                     }

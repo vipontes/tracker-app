@@ -22,6 +22,8 @@ class RoutePathRepository (application: Application) : AndroidViewModel(applicat
 
     fun insert(sqliteRoutePath: SqliteRoutePath): Long = database.routePathDao().insert(sqliteRoutePath)
 
+    fun insert(collection: List<SqliteRoutePath>) = database.routePathDao().insert(collection)
+
     fun delete(userRoutePathId: Long) = database.routePathDao().delete(userRoutePathId)
 
     fun delete() = database.routePathDao().delete()

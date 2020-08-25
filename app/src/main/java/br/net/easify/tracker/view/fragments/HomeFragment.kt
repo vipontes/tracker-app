@@ -127,9 +127,7 @@ class HomeFragment : Fragment() {
 
         initializeMap()
         initializeStartStopButton()
-        initializetakePictureButton()
-
-
+        initializeTakePictureButton()
     }
 
     private fun initializeStartStopButton() {
@@ -154,7 +152,7 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun initializetakePictureButton() {
+    private fun initializeTakePictureButton() {
         dataBinding.takePictureButton.setOnClickListener(View.OnClickListener {
 
         })
@@ -194,7 +192,7 @@ class HomeFragment : Fragment() {
         dataBinding.mapView.onPause()
     }
 
-    fun addMarker(center: GeoPoint) {
+    private fun addMarker(center: GeoPoint) {
         val marker = Marker(dataBinding.mapView)
         marker.position = center
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)

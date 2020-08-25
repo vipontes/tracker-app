@@ -15,6 +15,10 @@ interface RoutePathDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(sqliteRoutePath: SqliteRoutePath): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(collection: List<SqliteRoutePath>)
+
+
     @Query("DELETE FROM user_route_path WHERE user_route_path_id = :userRoutePathId")
     fun delete(userRoutePathId: Long)
 

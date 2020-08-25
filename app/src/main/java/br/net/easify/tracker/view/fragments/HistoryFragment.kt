@@ -72,6 +72,7 @@ class HistoryFragment : Fragment(), RouteHistoryAdapter.OnItemClick {
 
     override fun onItemClick(route: SqliteRoute) {
         val intent = Intent(requireContext(), RouteActivity::class.java)
+        intent.putExtra("routeId", route.user_route_id as Long)
         startActivity(intent)
     }
 
