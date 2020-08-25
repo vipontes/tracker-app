@@ -39,8 +39,12 @@ class Formatter {
             return java.lang.String.format(
                 "%02d:%02d:%02d",
                 TimeUnit.MILLISECONDS.toHours(milliSeconds),
-                TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
-                TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds))
+                TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(
+                    TimeUnit.MILLISECONDS.toHours(milliSeconds)
+                ),
+                TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(
+                    TimeUnit.MILLISECONDS.toMinutes(milliSeconds)
+                )
             )
         }
 
@@ -49,7 +53,9 @@ class Formatter {
             return java.lang.String.format(
                 "%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(milliSeconds),
-                TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds))
+                TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(
+                    TimeUnit.MILLISECONDS.toMinutes(milliSeconds)
+                )
             )
         }
     }

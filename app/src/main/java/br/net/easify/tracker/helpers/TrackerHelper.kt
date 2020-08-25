@@ -32,10 +32,15 @@ class TrackerHelper {
 
             val averageSpeedInMetersPerSeconds = totalDistance / totalTime
 
-            return convertMetersPerSecondsIntoKilometerPerHour(averageSpeedInMetersPerSeconds)
+            return convertMetersPerSecondsIntoKilometerPerHour(
+                averageSpeedInMetersPerSeconds
+            )
         }
 
-        fun calculateCalories(weigth: Int, path: List<SqliteRoutePath>): Double {
+        fun calculateCalories(
+            weigth: Int,
+            path: List<SqliteRoutePath>
+        ): Double {
 
             val speed = calculateAverageSpeedInKmPerHour(path)
 
@@ -57,7 +62,7 @@ class TrackerHelper {
 
             if (path.size < 2)
                 return 0.0
-            
+
             var lastLatitude = 0.0
             var lastLongitude = 0.0
             var totalDistance = 0.0
@@ -67,9 +72,11 @@ class TrackerHelper {
                 val longitude = item.user_route_path_lng
 
                 if (lastLatitude != 0.0 && lastLongitude != 0.0) {
-                    val distanceInMeters: Float = calculateDistanceBetweenTwoGeolocationsInMeters(
-                        lastLatitude, lastLongitude, 0.0,
-                        latitude, longitude, 0.0)
+                    val distanceInMeters: Float =
+                        calculateDistanceBetweenTwoGeolocationsInMeters(
+                            lastLatitude, lastLongitude, 0.0,
+                            latitude, longitude, 0.0
+                        )
                     totalDistance += distanceInMeters
                 }
 
@@ -80,18 +87,28 @@ class TrackerHelper {
             return totalDistance
         }
 
-        private fun calculateElapsedTimeInHour(startDate: String, endDate: String): Double {
+        private fun calculateElapsedTimeInHour(
+            startDate: String,
+            endDate: String
+        ): Double {
 
-            val startTime: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate)
-            val endTime: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate)
+            val startTime: Date =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate)
+            val endTime: Date =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate)
 
             return ((endTime.time - startTime.time) / 1000.0) / (60 * 60)
         }
 
-        private fun calculateElapsedTimeInSeconds(startDate: String, endDate: String): Double {
+        private fun calculateElapsedTimeInSeconds(
+            startDate: String,
+            endDate: String
+        ): Double {
 
-            val startTime: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate)
-            val endTime: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate)
+            val startTime: Date =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate)
+            val endTime: Date =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate)
 
             return (endTime.time - startTime.time) / 1000.0
         }
@@ -113,7 +130,11 @@ class TrackerHelper {
             val latDistance = Math.toRadians(latitude2 - latitude1)
             val lonDistance = Math.toRadians(longitude2 - longitude1)
             val a = (Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                    + (Math.cos(Math.toRadians(latitude1)) * Math.cos(Math.toRadians(latitude2))
+                    + (Math.cos(Math.toRadians(latitude1)) * Math.cos(
+                Math.toRadians(
+                    latitude2
+                )
+            )
                     * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2)))
             val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
             var distance = earthRadius * c * 1000 // convert to meters

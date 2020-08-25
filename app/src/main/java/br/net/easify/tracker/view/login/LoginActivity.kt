@@ -15,6 +15,7 @@ import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.model.User
+import br.net.easify.tracker.repositories.database.model.SqliteUser
 import br.net.easify.tracker.view.main.MainActivity
 import br.net.easify.tracker.viewmodel.LoginViewModel
 import com.karumi.dexter.Dexter
@@ -49,8 +50,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private val userObserver = Observer<User> {
+    private val userObserver = Observer<SqliteUser> {
+        if (it != null) {
             startMainActivity()
+            finish()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +69,8 @@ class LoginActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_NETWORK_STATE,
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
             .withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
 
@@ -80,24 +85,16 @@ class LoginActivity : AppCompatActivity() {
             }).check()
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-
-        if (viewModel.getLoggedUser() != null) {
-            startMainActivity()
-            return
-        }
+        viewModel.loginBody.observe(this, loginObserver)
+        viewModel.userData.observe(this, userObserver)
+        viewModel.tokens.observe(this, tokensObserver)
+        viewModel.errorResponse.observe(this, errorMessageObserver)
 
         dataBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_login)
 
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-        viewModel.loginBody.observe(this, loginObserver)
-        viewModel.userRepository.loggedUser.observe(this, userObserver)
-        viewModel.userRepository.tokens.observe(this, tokensObserver)
-        viewModel.userRepository.errorResponse.observe(this, errorMessageObserver)
-        viewModel.error.observe(this, errorMessageObserver)
-
         dataBinding.loginButton.setOnClickListener(View.OnClickListener {
-            if ( viewModel.validate() ) {
+            if (viewModel.validate()) {
                 dataBinding.spinner.visibility = View.VISIBLE
                 dataBinding.loginButton.visibility = View.GONE
                 viewModel.login()
@@ -112,6 +109,5 @@ class LoginActivity : AppCompatActivity() {
                     Intent.FLAG_ACTIVITY_CLEAR_TASK or
                     Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(mainActivity)
-        finish()
     }
 }

@@ -21,13 +21,25 @@ import br.net.easify.tracker.model.*
 import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
+import br.net.easify.tracker.repositories.api.RouteService
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 import org.osmdroid.util.GeoPoint
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val disposable = CompositeDisposable()
+
+    val trackerRoute by lazy { MutableLiveData<SqliteRoute>() }
+    val toastMessage by lazy { MutableLiveData<Response>() }
     val trackerActivityState by lazy { MutableLiveData<TrackerActivityState>() }
     val currentLocation by lazy { MutableLiveData<GeoPoint>() }
+
+    private var routeService = RouteService(application)
 
     @Inject
     lateinit var serviceHelper: ServiceHelper
@@ -59,7 +71,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         override fun onReceive(context: Context, intent: Intent) {
             val resultCode = intent.getIntExtra(Constants.resultCode, Activity.RESULT_CANCELED)
             if (resultCode == Activity.RESULT_OK) {
-                val route = routeRepository.trackerRoute.value as SqliteRoute
+                val route = trackerRoute.value as SqliteRoute
                 route.let {
                     val elapsedTime = intent.getLongExtra(Constants.elapsedTime, 0)
                     val displayData = Formatter.hmsTimeFormatter(elapsedTime)
@@ -82,7 +94,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     route.user_route_calories = Formatter.decimalFormatterOneDigit(calories)
                     route.user_route_speed = Formatter.decimalFormatterOneDigit(speed)
 
-                    routeRepository.trackerRoute.value = route
+                    trackerRoute.value = route
                     routeRepository.update(route)
                 }
             }
@@ -101,7 +113,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         LocalBroadcastManager.getInstance(getApplication())
             .registerReceiver(onTimerServiceNotification, timerIntent)
 
-        routeRepository.trackerRoute.value = createEmptyRoute(0, "", "", 0)
+        trackerRoute.value = createEmptyRoute(0, "", "", 0)
 
         checkRunningActivity()
     }
@@ -183,10 +195,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     routePathRepository.insert(routePath)
                     prefs.setCurrentRoute(routeId.toString())
                     trackerActivityState.value = TrackerActivityState.started
-                    routeRepository.trackerRoute.value = route
+                    trackerRoute.value = route
                     startTimerService()
                 } else {
-                    routeRepository.toastMessage.value =
+                    toastMessage.value =
                         Response((getApplication() as MainApplication).getString(R.string.start_activity_error))
                 }
             }
@@ -222,10 +234,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             finishTrackerActivity(route, stopDatetime)
             if ( finishUserRoute(route, stopDatetime) ) {
                 stopTimerService()
-                routeRepository.synchronizeTrackingActivity(route)
+                synchronizeTrackingActivity(route)
                 sendNotificationToHomeFragment(route)
             } else {
-                routeRepository.toastMessage.value =
+                toastMessage.value =
                     Response((getApplication() as MainApplication).getString(R.string.stopping_tracking_error))
             }
         }
@@ -234,7 +246,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun sendNotificationToHomeFragment(route: SqliteRoute) {
         prefs.removeCurrentRoute()
         trackerActivityState.value = TrackerActivityState.idle
-        routeRepository.trackerRoute.value = createEmptyRoute(0, "", "", 0)
+        trackerRoute.value = createEmptyRoute(0, "", "", 0)
     }
 
     private fun finishTrackerActivity(route: SqliteRoute, stopDatetime: String) {
@@ -282,9 +294,53 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return path
     }
 
+    fun synchronizeTrackingActivity(route: SqliteRoute) {
+        val userId = userRepository.getLoggedUser()?.user_Id!!
+        val data = routeRepository.getRoutePost(route, userId)
+
+        disposable.add(
+            routeService.postRoute(data)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<Route>() {
+                    override fun onSuccess(res: Route) {
+                        route.sync = 1
+                        routeRepository.update(route)
+                        toastMessage.value =
+                            Response((getApplication() as MainApplication).getString(R.string.tracking_successfully_saved))
+                    }
+
+                    override fun onError(e: Throwable) {
+                        e.printStackTrace()
+
+                        if (e is HttpException) {
+                            if (e.code() == 401) {
+                                toastMessage.value =
+                                    Response((getApplication() as MainApplication).getString(R.string.unauthorized))
+                            } else {
+//                                toastMessage.value =
+//                                    Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                                toastMessage.value = Response(false, e.message())
+                            }
+                        } else {
+//                            toastMessage.value =
+//                                Response((getApplication() as MainApplication).getString(R.string.internal_error))
+                            toastMessage.value = Response(false, e.toString())
+                        }
+                    }
+                })
+        )
+    }
+
     override fun onCleared() {
         super.onCleared()
-        LocalBroadcastManager.getInstance(getApplication()).unregisterReceiver(onLocationServiceNotification)
-        LocalBroadcastManager.getInstance(getApplication()).unregisterReceiver(onTimerServiceNotification)
+
+        LocalBroadcastManager.getInstance(getApplication())
+            .unregisterReceiver(onLocationServiceNotification)
+
+        LocalBroadcastManager.getInstance(getApplication())
+            .unregisterReceiver(onTimerServiceNotification)
+
+        disposable.clear()
     }
 }

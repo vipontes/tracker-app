@@ -1,16 +1,25 @@
 package br.net.easify.tracker.view.main
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
 import br.net.easify.tracker.R
+import br.net.easify.tracker.repositories.api.interceptor.AuthInterceptor
+import br.net.easify.tracker.repositories.database.model.SqliteUser
 import br.net.easify.tracker.view.fragments.GalleryFragment
 import br.net.easify.tracker.view.fragments.HistoryFragment
 import br.net.easify.tracker.view.fragments.HomeFragment
 import br.net.easify.tracker.view.fragments.SettingsFragment
+import br.net.easify.tracker.view.login.LoginActivity
 import br.net.easify.tracker.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import org.osmdroid.config.Configuration
@@ -37,8 +46,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
         setContentView(R.layout.activity_main)
-
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         viewModel.startLocationService()

@@ -41,9 +41,9 @@ class RouteHistoryAdapter(private var application: Application, private var rout
         if ( route.sync == 0 && route.in_progress == 0 ) {
             holder.view.refreshButton.visibility = View.VISIBLE
 
-            holder.view.refreshButton.setOnClickListener(View.OnClickListener {
-                routeRepository.synchronizeTrackingActivity(route)
-            })
+//            holder.view.refreshButton.setOnClickListener(View.OnClickListener {
+//                routeRepository.synchronizeTrackingActivity(route)
+//            })
         }
 
         holder.view.route = route

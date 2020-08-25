@@ -50,8 +50,8 @@ class UserDataDialog : DialogFragment() {
         isCancelable = false
 
         viewModel = ViewModelProviders.of(this).get(UserDataViewModel::class.java)
-        viewModel.userRepository.userData.observe(this, userObserver)
-        viewModel.userRepository.errorResponse.observe(this, errorMessageObserver)
+        viewModel.userData.observe(this, userObserver)
+        viewModel.errorResponse.observe(this, errorMessageObserver)
 
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(

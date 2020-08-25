@@ -29,10 +29,6 @@ class SettingsFragment : Fragment() {
         if (it != null) {
             userData = it
             dataBinding.userData = userData
-        } else {
-            val intent = Intent(context, LoginActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()
         }
     }
 
@@ -41,10 +37,19 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
+        dataBinding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_settings,
+            container,
+            false
+        )
 
-        viewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
-        viewModel.userRepository.userData.observe(viewLifecycleOwner, userDataObserver)
+        viewModel =
+            ViewModelProviders.of(this).get(SettingsViewModel::class.java)
+        viewModel.userData.observe(
+            viewLifecycleOwner,
+            userDataObserver
+        )
 
         return dataBinding.root
     }
@@ -64,15 +69,29 @@ class SettingsFragment : Fragment() {
         })
 
         dataBinding.logout.setOnClickListener(View.OnClickListener {
-            alertDialog = CustomAlertDialog.show(requireContext(), getString(R.string.logout),
+            alertDialog = CustomAlertDialog.show(requireContext(),
+                getString(R.string.logout),
                 getString(R.string.logout_confirmation),
-                getString(R.string.yes), View.OnClickListener {
+                getString(R.string.yes),
+                View.OnClickListener {
                     alertDialog!!.dismiss()
                     viewModel.logout()
+                    getLoginActivity()
+
                 },
                 getString(R.string.no),
                 View.OnClickListener { alertDialog!!.dismiss() }
             )
         })
+    }
+
+    private fun getLoginActivity() {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.flags =
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+        activity?.startActivity(intent)
+        activity?.finish()
     }
 }

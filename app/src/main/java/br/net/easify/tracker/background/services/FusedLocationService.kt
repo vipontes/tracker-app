@@ -35,7 +35,8 @@ import javax.inject.Inject
  * After some tests, I noticed that this implementation is not as good as LocationService one
  * I'm keeping this code here for future reference
  */
-class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks,
+    GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private var mGoogleApiClient: GoogleApiClient? = null
     private var mLocationRequest: LocationRequest? = null
@@ -51,10 +52,15 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
     lateinit var prefs: SharedPreferencesHelper
 
     companion object {
-        val locationChangeAction = "br.net.easify.tracker.background.receivers.LocationBroadcastReceiver"
+        val locationChangeAction =
+            "br.net.easify.tracker.background.receivers.LocationBroadcastReceiver"
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         super.onStartCommand(intent, flags, startId)
 
         context = getApplicationContext();
@@ -80,9 +86,16 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
     fun checkPermsion(context: Context?): Boolean {
         val MyVersion = Build.VERSION.SDK_INT
         return if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    context!!,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 false
-            } else ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            } else ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
         } else {
             true
         }
@@ -92,7 +105,8 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
         mLocationRequest = LocationRequest.create()
         mLocationRequest!!.interval = updateInterval
         mLocationRequest!!.fastestInterval = fastestUpdateInterval
-        mLocationRequest!!.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        mLocationRequest!!.priority =
+            LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         mGoogleApiClient!!.connect()
     }
 
@@ -115,7 +129,11 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                 return
             }
 
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient,
+                mLocationRequest,
+                this
+            )
         }
     }
 
@@ -151,8 +169,14 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
     }
 
     private fun startForegroundService() {
-        val notificationIntent = Intent(applicationContext, MainActivity::class.java)
-        val contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val notificationIntent =
+            Intent(applicationContext, MainActivity::class.java)
+        val contentIntent = PendingIntent.getActivity(
+            this,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
         val notification =
             NotificationCompat.Builder(this, Constants.channelId)
                 .setContentTitle("Tracker")
@@ -194,12 +218,20 @@ class FusedLocationService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                 if (route.in_progress == 1) {
                     val currentTime = Formatter.currentDateTimeYMDAsString()
                     val routeId = route.user_route_id!!
-                    val path = SqliteRoutePath(null, routeId, lastLocation.latitude, lastLocation.longitude, lastLocation.altitude, currentTime)
+                    val path = SqliteRoutePath(
+                        null,
+                        routeId,
+                        lastLocation.latitude,
+                        lastLocation.longitude,
+                        lastLocation.altitude,
+                        currentTime
+                    )
                     database.routePathDao().insert(path)
                 }
             }
 
-            val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+            val broadcastManager =
+                LocalBroadcastManager.getInstance(applicationContext)
             broadcastManager.sendBroadcast(intent)
         }
     }

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -14,11 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.databinding.FragmentHomeBinding
 import br.net.easify.tracker.enums.TrackerActivityState
 import br.net.easify.tracker.helpers.CustomAlertDialog
 import br.net.easify.tracker.model.Response
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.viewmodel.HomeViewModel
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -36,38 +35,50 @@ class HomeFragment : Fragment() {
     private var alertDialog: AlertDialog? = null
     private var currentLocation: GeoPoint? = null
 
-    private val trackerActivityStateObserver = Observer<TrackerActivityState> { state: TrackerActivityState ->
-        state.let {
-            if (it == TrackerActivityState.idle) {
-                dataBinding.startStopButton.text = requireContext().getString(R.string.start)
-                dataBinding.startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
-                dataBinding.takePictureButton.visibility = View.GONE
-                dataBinding.spinner.visibility = View.GONE
-            } else if (it == TrackerActivityState.started) {
-                dataBinding.startStopButton.text = requireContext().getString(R.string.stop)
-                dataBinding.startStopButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorRed)
-                dataBinding.takePictureButton.visibility = View.VISIBLE
-                dataBinding.spinner.visibility = View.VISIBLE
+    private val trackerActivityStateObserver =
+        Observer<TrackerActivityState> { state: TrackerActivityState ->
+            state.let {
+                if (it == TrackerActivityState.idle) {
+                    dataBinding.startStopButton.text =
+                        requireContext().getString(R.string.start)
+                    dataBinding.startStopButton.backgroundTintList =
+                        ContextCompat.getColorStateList(
+                            requireContext(),
+                            R.color.colorAccent
+                        )
+                    dataBinding.takePictureButton.visibility = View.GONE
+                    dataBinding.spinner.visibility = View.GONE
+                } else if (it == TrackerActivityState.started) {
+                    dataBinding.startStopButton.text =
+                        requireContext().getString(R.string.stop)
+                    dataBinding.startStopButton.backgroundTintList =
+                        ContextCompat.getColorStateList(
+                            requireContext(),
+                            R.color.colorRed
+                        )
+                    dataBinding.takePictureButton.visibility = View.VISIBLE
+                    dataBinding.spinner.visibility = View.VISIBLE
+                }
             }
         }
-    }
 
-    private val currentLocationObserver = Observer<GeoPoint> { centerPoint: GeoPoint ->
-        centerPoint.let {
-            currentLocation = it
+    private val currentLocationObserver =
+        Observer<GeoPoint> { centerPoint: GeoPoint ->
+            centerPoint.let {
+                currentLocation = it
 
-            dataBinding.mapView.overlays.clear()
-            addMarker(it)
-            mapController.animateTo(it)
-            if (viewModel.getTrackerState() == TrackerActivityState.idle) {
-                viewModel.stopLocationService()
-                dataBinding.spinner.visibility = View.GONE
-            } else {
-                drawPath(viewModel.getCurrentTrackerPath())
+                dataBinding.mapView.overlays.clear()
+                addMarker(it)
+                mapController.animateTo(it)
+                if (viewModel.getTrackerState() == TrackerActivityState.idle) {
+                    viewModel.stopLocationService()
+                    dataBinding.spinner.visibility = View.GONE
+                } else {
+                    drawPath(viewModel.getCurrentTrackerPath())
+                }
+                dataBinding.mapView.invalidate()
             }
-            dataBinding.mapView.invalidate()
         }
-    }
 
     private val toastMessageObserver = Observer<Response> {
         Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
@@ -83,13 +94,30 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        dataBinding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_home,
+            container,
+            false
+        )
 
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
-        viewModel.trackerActivityState.observe(viewLifecycleOwner, trackerActivityStateObserver)
-        viewModel.currentLocation.observe(viewLifecycleOwner, currentLocationObserver)
-        viewModel.routeRepository.toastMessage.observe(viewLifecycleOwner, toastMessageObserver)
-        viewModel.routeRepository.trackerRoute.observe(viewLifecycleOwner, trackerActivityObserver)
+        viewModel.trackerActivityState.observe(
+            viewLifecycleOwner,
+            trackerActivityStateObserver
+        )
+        viewModel.currentLocation.observe(
+            viewLifecycleOwner,
+            currentLocationObserver
+        )
+        viewModel.toastMessage.observe(
+            viewLifecycleOwner,
+            toastMessageObserver
+        )
+        viewModel.trackerRoute.observe(
+            viewLifecycleOwner,
+            trackerActivityObserver
+        )
 
         return dataBinding.root
     }
@@ -110,9 +138,11 @@ class HomeFragment : Fragment() {
                 if (it == TrackerActivityState.idle) {
                     startTrackerActivity()
                 } else {
-                    alertDialog = CustomAlertDialog.show(requireContext(), getString(R.string.tracker_activity),
+                    alertDialog = CustomAlertDialog.show(requireContext(),
+                        getString(R.string.tracker_activity),
                         getString(R.string.finish_activity_confirmation),
-                        getString(R.string.yes), View.OnClickListener {
+                        getString(R.string.yes),
+                        View.OnClickListener {
                             alertDialog!!.dismiss()
                             stopTrackerActivity()
                         },
@@ -143,7 +173,9 @@ class HomeFragment : Fragment() {
     private fun initializeMap() {
         dataBinding.mapView.setUseDataConnection(true)
         dataBinding.mapView.setTileSource(TileSourceFactory.MAPNIK)
-        dataBinding.mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        dataBinding.mapView.zoomController.setVisibility(
+            CustomZoomButtonsController.Visibility.NEVER
+        );
         dataBinding.mapView.setMultiTouchControls(true)
 
         mapController = dataBinding.mapView.controller as MapController
@@ -171,7 +203,12 @@ class HomeFragment : Fragment() {
 
     private fun drawPath(path: ArrayList<GeoPoint>) {
         val polyline = Polyline(dataBinding.mapView, true, false)
-        polyline.setColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+        polyline.setColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorPrimaryDark
+            )
+        )
         for (point in path) {
             polyline.addPoint(point)
         }

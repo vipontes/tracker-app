@@ -6,12 +6,15 @@ import androidx.lifecycle.AndroidViewModel
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.helpers.ServiceHelper
-import io.reactivex.disposables.CompositeDisposable
+import br.net.easify.tracker.repositories.UserRepository
 import javax.inject.Inject
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     @Inject
     lateinit var serviceHelper: ServiceHelper
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)

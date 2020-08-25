@@ -8,6 +8,7 @@ import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
 import br.net.easify.tracker.view.adapters.RouteHistoryAdapter
+import br.net.easify.tracker.view.main.MainActivity
 import br.net.easify.tracker.viewmodel.*
 import dagger.Component
 import javax.inject.Singleton

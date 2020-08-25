@@ -16,14 +16,19 @@ class TimerService : Service() {
     private var timerTask: TimerTask? = null
 
     companion object {
-        val timerServiceElapsedTimeChanged = "br.net.easify.tracker.background.services.TimerService"
+        val timerServiceElapsedTimeChanged =
+            "br.net.easify.tracker.background.services.TimerService"
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         super.onStartCommand(intent, flags, startId)
         startTimer()
         return START_STICKY
@@ -49,7 +54,8 @@ class TimerService : Service() {
                 intent.putExtra(Constants.resultCode, Activity.RESULT_OK)
                 intent.putExtra(Constants.elapsedTime, elapsedTime)
 
-                val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+                val broadcastManager =
+                    LocalBroadcastManager.getInstance(applicationContext)
                 broadcastManager.sendBroadcast(intent)
             }
         }

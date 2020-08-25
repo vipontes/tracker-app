@@ -8,7 +8,8 @@ import javax.inject.Singleton
 @Singleton
 class SharedPreferencesHelper @Inject constructor(context: Context) {
 
-    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+    private val prefs =
+        PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
     private val currentRoute = "currentRoute"
 
@@ -16,7 +17,7 @@ class SharedPreferencesHelper @Inject constructor(context: Context) {
         prefs.edit().putString(currentRoute, value).apply()
     }
 
-    fun getCurrentRoute():String {
+    fun getCurrentRoute(): String {
         return if (prefs != null) {
             prefs.getString(currentRoute, "")!!
         } else {

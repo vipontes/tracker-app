@@ -39,10 +39,15 @@ class LocationService : Service(), LocationListener {
     lateinit var prefs: SharedPreferencesHelper
 
     companion object {
-        val locationChangeAction = "br.net.easify.tracker.background.receivers.LocationBroadcastReceiver"
+        val locationChangeAction =
+            "br.net.easify.tracker.background.receivers.LocationBroadcastReceiver"
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         super.onStartCommand(intent, flags, startId)
 
         startForegroundService()
@@ -53,7 +58,8 @@ class LocationService : Service(), LocationListener {
         super.onCreate()
 
         (application as MainApplication).getAppComponent()?.inject(this)
-        locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         val criteria = Criteria()
         criteria.accuracy = Criteria.ACCURACY_FINE
@@ -63,7 +69,13 @@ class LocationService : Service(), LocationListener {
         criteria.isBearingRequired = false
 
         try {
-            locationManager.requestLocationUpdates(defaultLocationInterval, defaultLocationDistance, criteria, this, null)
+            locationManager.requestLocationUpdates(
+                defaultLocationInterval,
+                defaultLocationDistance,
+                criteria,
+                this,
+                null
+            )
         } catch (ex: SecurityException) {
         } catch (ex: IllegalArgumentException) {
         }
@@ -117,14 +129,21 @@ class LocationService : Service(), LocationListener {
 
             if (previousLocation == null ||
                 (it.latitude != previousLocation.latitude &&
-                it.longitude != previousLocation.longitude)
+                        it.longitude != previousLocation.longitude)
             ) {
                 val route = getCurrentRoute()
                 route?.let { value: SqliteRoute ->
                     if (value.in_progress == 1) {
                         val currentTime = Formatter.currentDateTimeYMDAsString()
                         val routeId = value.user_route_id!!
-                        val path = SqliteRoutePath(null, routeId, it.latitude, it.longitude, it.altitude, currentTime)
+                        val path = SqliteRoutePath(
+                            null,
+                            routeId,
+                            it.latitude,
+                            it.longitude,
+                            it.altitude,
+                            currentTime
+                        )
                         database.routePathDao().insert(path)
                     }
                 }
@@ -142,17 +161,30 @@ class LocationService : Service(), LocationListener {
         intent.putExtra(Constants.latitude, location.latitude)
         intent.putExtra(Constants.longitude, location.longitude)
 
-        val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+        val broadcastManager =
+            LocalBroadcastManager.getInstance(applicationContext)
         broadcastManager.sendBroadcast(intent)
     }
 
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+    override fun onStatusChanged(
+        provider: String?,
+        status: Int,
+        extras: Bundle?
+    ) {
+    }
+
     override fun onProviderEnabled(provider: String?) {}
     override fun onProviderDisabled(provider: String?) {}
 
     private fun startForegroundService() {
-        val notificationIntent = Intent(applicationContext, MainActivity::class.java)
-        val contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val notificationIntent =
+            Intent(applicationContext, MainActivity::class.java)
+        val contentIntent = PendingIntent.getActivity(
+            this,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
         val notification =
             NotificationCompat.Builder(this, Constants.channelId)
                 .setContentTitle("Tracker")

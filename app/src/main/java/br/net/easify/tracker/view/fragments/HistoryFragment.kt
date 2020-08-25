@@ -10,8 +10,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.databinding.FragmentHistoryBinding
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.view.adapters.RouteHistoryAdapter
 import br.net.easify.tracker.viewmodel.HistoryViewModel
 
@@ -35,11 +35,23 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_history, container, false)
+        dataBinding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_history,
+            container,
+            false
+        )
 
-        viewModel = ViewModelProviders.of(this).get(HistoryViewModel::class.java)
-        viewModel.routeRepository.routes.observe(viewLifecycleOwner, routesObserver)
-        viewModel.totalDistance.observe(viewLifecycleOwner, totalDistanceObserver)
+        viewModel =
+            ViewModelProviders.of(this).get(HistoryViewModel::class.java)
+        viewModel.routes.observe(
+            viewLifecycleOwner,
+            routesObserver
+        )
+        viewModel.totalDistance.observe(
+            viewLifecycleOwner,
+            totalDistanceObserver
+        )
         viewModel.refresh()
 
         return dataBinding.root
@@ -47,10 +59,12 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        routesAdapter = RouteHistoryAdapter(requireActivity().application, arrayListOf())
+        routesAdapter =
+            RouteHistoryAdapter(requireActivity().application, arrayListOf())
         dataBinding.routesHistory.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = routesAdapter
         }
     }
+
 }
