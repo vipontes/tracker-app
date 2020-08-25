@@ -10,7 +10,7 @@ import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.Route
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
-import br.net.easify.tracker.repositories.api.RouteService
+import br.net.easify.tracker.api.RouteService
 import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

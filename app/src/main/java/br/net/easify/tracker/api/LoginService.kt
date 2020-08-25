@@ -1,9 +1,9 @@
-package br.net.easify.tracker.repositories.api
+package br.net.easify.tracker.api
 
 import android.app.Application
 import br.net.easify.tracker.model.LoginBody
 import br.net.easify.tracker.model.Token
-import br.net.easify.tracker.repositories.api.interfaces.ILogin
+import br.net.easify.tracker.api.interfaces.ILogin
 import io.reactivex.Single
 
 class LoginService (application: Application) {

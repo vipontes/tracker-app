@@ -1,9 +1,9 @@
-package br.net.easify.tracker.repositories.api
+package br.net.easify.tracker.api
 
 import android.app.Application
 import br.net.easify.tracker.model.Route
 import br.net.easify.tracker.model.RoutePost
-import br.net.easify.tracker.repositories.api.interfaces.IRoute
+import br.net.easify.tracker.api.interfaces.IRoute
 import io.reactivex.Single
 
 class RouteService(application: Application) {

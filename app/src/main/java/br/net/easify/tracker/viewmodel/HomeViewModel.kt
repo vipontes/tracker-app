@@ -21,7 +21,7 @@ import br.net.easify.tracker.model.*
 import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
-import br.net.easify.tracker.repositories.api.RouteService
+import br.net.easify.tracker.api.RouteService
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver

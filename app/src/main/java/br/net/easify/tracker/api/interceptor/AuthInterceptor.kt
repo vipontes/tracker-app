@@ -1,12 +1,12 @@
-package br.net.easify.tracker.repositories.api.interceptor
+package br.net.easify.tracker.api.interceptor
 
 import android.app.Application
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
 import br.net.easify.tracker.model.RefreshTokenBody
 import br.net.easify.tracker.model.Token
-import br.net.easify.tracker.repositories.api.RetrofitBuilder
-import br.net.easify.tracker.repositories.api.interfaces.ILogin
+import br.net.easify.tracker.api.RetrofitBuilder
+import br.net.easify.tracker.api.interfaces.ILogin
 import br.net.easify.tracker.repositories.database.AppDatabase
 import br.net.easify.tracker.repositories.database.model.SqliteToken
 import kotlinx.coroutines.runBlocking

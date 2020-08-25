@@ -8,7 +8,7 @@ import br.net.easify.tracker.R
 import br.net.easify.tracker.interfaces.ILocalUser
 import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.repositories.UserRepository
-import br.net.easify.tracker.repositories.api.UserService
+import br.net.easify.tracker.api.UserService
 import br.net.easify.tracker.repositories.database.model.SqliteUser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

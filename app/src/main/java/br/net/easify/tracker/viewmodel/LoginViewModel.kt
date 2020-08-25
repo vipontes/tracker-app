@@ -11,8 +11,8 @@ import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.Token
 import br.net.easify.tracker.model.User
 import br.net.easify.tracker.repositories.UserRepository
-import br.net.easify.tracker.repositories.api.LoginService
-import br.net.easify.tracker.repositories.api.UserService
+import br.net.easify.tracker.api.LoginService
+import br.net.easify.tracker.api.UserService
 import br.net.easify.tracker.repositories.database.model.SqliteToken
 import br.net.easify.tracker.repositories.database.model.SqliteUser
 import com.auth0.android.jwt.JWT

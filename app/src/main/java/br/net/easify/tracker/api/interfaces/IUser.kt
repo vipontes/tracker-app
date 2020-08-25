@@ -1,4 +1,4 @@
-package br.net.easify.tracker.repositories.api.interfaces
+package br.net.easify.tracker.api.interfaces
 
 import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.User

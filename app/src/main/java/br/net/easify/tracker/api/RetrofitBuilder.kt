@@ -1,8 +1,8 @@
-package br.net.easify.tracker.repositories.api
+package br.net.easify.tracker.api
 
 import android.app.Application
 import br.net.easify.tracker.helpers.Constants
-import br.net.easify.tracker.repositories.api.interceptor.AuthInterceptor
+import br.net.easify.tracker.api.interceptor.AuthInterceptor
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

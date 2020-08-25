@@ -1,14 +1,13 @@
 package br.net.easify.tracker.di.component
 
 import br.net.easify.tracker.MainApplication
-import br.net.easify.tracker.repositories.api.interceptor.AuthInterceptor
+import br.net.easify.tracker.api.interceptor.AuthInterceptor
 import br.net.easify.tracker.background.services.LocationService
 import br.net.easify.tracker.di.module.*
 import br.net.easify.tracker.repositories.RoutePathRepository
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
 import br.net.easify.tracker.view.adapters.RouteHistoryAdapter
-import br.net.easify.tracker.view.main.MainActivity
 import br.net.easify.tracker.viewmodel.*
 import dagger.Component
 import javax.inject.Singleton
