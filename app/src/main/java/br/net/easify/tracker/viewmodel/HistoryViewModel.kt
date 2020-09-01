@@ -44,52 +44,61 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
         getAll()
     }
 
+    fun refreshApi() {
+        getRouteFromApi()
+    }
 
-    fun getAll() {
-        var localRoutes = routeRepository.getAll()
+    private fun getAll() {
+        val localRoutes = routeRepository.getAll()
         if (localRoutes != null && localRoutes.isNotEmpty()) {
             routes.value = localRoutes
         } else {
-            val userId = userRepository.getLoggedUser()?.user_Id!!
-            disposable.add(
-                routeService.getRoutesByUser(userId)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(object : DisposableSingleObserver<List<Route>>() {
-                        override fun onSuccess(res: List<Route>) {
+            getRouteFromApi()
+        }
+    }
 
-                            var routesFromApi: ArrayList<SqliteRoute> = arrayListOf()
-                            for (item in res) {
-                                val route = SqliteRoute(0, 1).fromRoute(item)
-                                routeRepository.insert(route)
-                                routesFromApi.add(route)
-                            }
+    private fun getRouteFromApi() {
+        routeRepository.delete()
 
-                            routes.value = routesFromApi
+        val userId = userRepository.getLoggedUser()?.user_Id!!
+        disposable.add(
+            routeService.getRoutesByUser(userId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<List<Route>>() {
+                    override fun onSuccess(res: List<Route>) {
+
+                        var routesFromApi: ArrayList<SqliteRoute> = arrayListOf()
+                        for (item in res) {
+                            val route = SqliteRoute(0, 1).fromRoute(item)
+                            routeRepository.insert(route)
+                            routesFromApi.add(route)
                         }
 
-                        override fun onError(e: Throwable) {
-                            e.printStackTrace()
+                        routes.value = routesFromApi
+                    }
 
-                            if (e is HttpException) {
-                                if (e.code() == 401) {
-                                    toastMessage.value =
-                                        Response(false, (getApplication() as MainApplication).getString(
-                                            R.string.unauthorized))
-                                } else {
-                                    toastMessage.value =
-                                        Response(false, (getApplication() as MainApplication).getString(
-                                            R.string.internal_error))
-                                }
+                    override fun onError(e: Throwable) {
+                        e.printStackTrace()
+
+                        if (e is HttpException) {
+                            if (e.code() == 401) {
+                                toastMessage.value =
+                                    Response(false, (getApplication() as MainApplication).getString(
+                                        R.string.unauthorized))
                             } else {
                                 toastMessage.value =
                                     Response(false, (getApplication() as MainApplication).getString(
                                         R.string.internal_error))
                             }
+                        } else {
+                            toastMessage.value =
+                                Response(false, (getApplication() as MainApplication).getString(
+                                    R.string.internal_error))
                         }
-                    })
-            )
-        }
+                    }
+                })
+        )
     }
 
     fun getTotalDistance() {

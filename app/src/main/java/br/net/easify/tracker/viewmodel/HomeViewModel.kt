@@ -56,50 +56,86 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     @Inject
     lateinit var prefs: SharedPreferencesHelper
 
-    private val onLocationServiceNotification: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val resultCode = intent.getIntExtra(Constants.resultCode, Activity.RESULT_CANCELED)
-            if (resultCode == Activity.RESULT_OK) {
-                val latitude = intent.getDoubleExtra(Constants.latitude, 0.0)
-                val longitude = intent.getDoubleExtra(Constants.longitude, 0.0)
-                currentLocation.value = GeoPoint(latitude, longitude)
-            }
-        }
-    }
-
-    private val onTimerServiceNotification: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val resultCode = intent.getIntExtra(Constants.resultCode, Activity.RESULT_CANCELED)
-            if (resultCode == Activity.RESULT_OK) {
-                val route = trackerRoute.value as SqliteRoute
-                route.let {
-                    val elapsedTime = intent.getLongExtra(Constants.elapsedTime, 0)
-                    val displayData = Formatter.hmsTimeFormatter(elapsedTime)
-                    val path = routePathRepository.getPathFromRoute(route.user_route_id!!)
-                    val loggedUser = userRepository.getLoggedUser()
-                    var userWeight = Constants.defaultWeight
-                    loggedUser?.let {
-                        userWeight = it.user_weight
-                    }
-
-                    val rhythm = TrackerHelper.calculateAverageRhythmInMilisecondsPerKilometer(path)
-                    val formattedRhythm = Formatter.msTimeFormatter(rhythm.toLong())
-                    val distance = TrackerHelper.calculateDistanceInKilometers(path)
-                    val calories = TrackerHelper.calculateCalories(userWeight, path)
-                    val speed = TrackerHelper.calculateAverageSpeedInKmPerHour(path)
-
-                    route.user_route_duration = displayData
-                    route.user_route_rhythm = formattedRhythm
-                    route.user_route_distance = Formatter.decimalFormatterTwoDigits(distance)
-                    route.user_route_calories = Formatter.decimalFormatterOneDigit(calories)
-                    route.user_route_speed = Formatter.decimalFormatterOneDigit(speed)
-
-                    trackerRoute.value = route
-                    routeRepository.update(route)
+    private val onLocationServiceNotification: BroadcastReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val resultCode = intent.getIntExtra(
+                    Constants.resultCode,
+                    Activity.RESULT_CANCELED
+                )
+                if (resultCode == Activity.RESULT_OK) {
+                    val latitude =
+                        intent.getDoubleExtra(Constants.latitude, 0.0)
+                    val longitude =
+                        intent.getDoubleExtra(Constants.longitude, 0.0)
+                    currentLocation.value = GeoPoint(latitude, longitude)
                 }
             }
         }
-    }
+
+    private val onTimerServiceNotification: BroadcastReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val resultCode = intent.getIntExtra(
+                    Constants.resultCode,
+                    Activity.RESULT_CANCELED
+                )
+                if (resultCode == Activity.RESULT_OK) {
+
+                    var routeId: Long = 0
+                    prefs.getCurrentRoute().let {
+                        if (it.isNotEmpty()) {
+                            routeId = it.toLong()
+
+                            val elapsedTime =
+                                intent.getLongExtra(Constants.elapsedTime, 0)
+                            val displayData =
+                                Formatter.hmsTimeFormatter(elapsedTime)
+                            val path =
+                                routePathRepository.getPathFromRoute(routeId)
+                            val loggedUser = userRepository.getLoggedUser()
+                            var userWeight = Constants.defaultWeight
+                            loggedUser?.let {
+                                userWeight = it.user_weight
+                            }
+
+                            val rhythm =
+                                TrackerHelper.calculateAverageRhythmInMilisecondsPerKilometer(
+                                    path
+                                )
+                            val formattedRhythm =
+                                Formatter.msTimeFormatter(rhythm.toLong())
+                            val distance =
+                                TrackerHelper.calculateDistanceInKilometers(path)
+                            val calories = TrackerHelper.calculateCalories(
+                                userWeight,
+                                path
+                            )
+                            val speed =
+                                TrackerHelper.calculateAverageSpeedInKmPerHour(
+                                    path
+                                )
+
+                            var route = routeRepository.getRoute(routeId)
+
+                            route?.let { currentRoute ->
+                                currentRoute.user_route_duration = displayData
+                                currentRoute.user_route_rhythm = formattedRhythm
+                                currentRoute.user_route_distance =
+                                    Formatter.decimalFormatterTwoDigits(distance)
+                                currentRoute.user_route_calories =
+                                    Formatter.decimalFormatterOneDigit(calories)
+                                currentRoute.user_route_speed =
+                                    Formatter.decimalFormatterOneDigit(speed)
+
+                                trackerRoute.value = currentRoute
+                                routeRepository.update(currentRoute)
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
     init {
         trackerActivityState.value = TrackerActivityState.idle
@@ -109,7 +145,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         LocalBroadcastManager.getInstance(getApplication())
             .registerReceiver(onLocationServiceNotification, locationIntent)
 
-        val timerIntent = IntentFilter(TimerService.timerServiceElapsedTimeChanged)
+        val timerIntent =
+            IntentFilter(TimerService.timerServiceElapsedTimeChanged)
         LocalBroadcastManager.getInstance(getApplication())
             .registerReceiver(onTimerServiceNotification, timerIntent)
 
@@ -133,7 +170,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             if (route.in_progress == 1) {
                 trackerActivityState.value = TrackerActivityState.started
                 val routeId = route.user_route_id!!
-                val routePathList = routePathRepository.getPathFromRoute(routeId)
+                val routePathList =
+                    routePathRepository.getPathFromRoute(routeId)
                 if (routePathList.isNotEmpty()) {
                     val routePath = routePathList.last()
                     val latitude = routePath.user_route_path_lat
@@ -145,10 +183,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun startLocationService() {
-        val gpsService = LocationService()
-        val gpsIntent = Intent(getApplication(), gpsService::class.java)
-        if (!serviceHelper.isMyServiceRunning(gpsService::class.java)) {
-            (getApplication() as MainApplication).startService(gpsIntent)
+        val route = getCurrentRoute()
+        if (route?.in_progress == 0) {
+            val gpsService = LocationService()
+            val gpsIntent = Intent(getApplication(), gpsService::class.java)
+            if (!serviceHelper.isMyServiceRunning(gpsService::class.java)) {
+                (getApplication() as MainApplication).startService(gpsIntent)
+            }
         }
     }
 
@@ -185,13 +226,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 val databaseFieldTime = Formatter.currentDateTimeYMDAsString();
                 val description = "Activity $startTime"
 
-                val route = createEmptyRoute(userId, description, databaseFieldTime, 1)
+                val route =
+                    createEmptyRoute(userId, description, databaseFieldTime, 1)
                 val routeId = routeRepository.insert(route)
 
                 if (routeId > 0) {
                     route.user_route_id = routeId
                     routeRepository.update(route)
-                    val routePath = SqliteRoutePath(null, routeId, pt.latitude, pt.longitude, pt.altitude, databaseFieldTime)
+                    val routePath = SqliteRoutePath(
+                        null,
+                        routeId,
+                        pt.latitude,
+                        pt.longitude,
+                        pt.altitude,
+                        databaseFieldTime
+                    )
                     routePathRepository.insert(routePath)
                     prefs.setCurrentRoute(routeId.toString())
                     trackerActivityState.value = TrackerActivityState.started
@@ -199,7 +248,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     startTimerService()
                 } else {
                     toastMessage.value =
-                        Response((getApplication() as MainApplication).getString(R.string.start_activity_error))
+                        Response(
+                            (getApplication() as MainApplication).getString(
+                                R.string.start_activity_error
+                            )
+                        )
                 }
             }
         }
@@ -232,7 +285,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         route?.let {
             val stopDatetime = Formatter.currentDateTimeYMDAsString();
             finishTrackerActivity(route, stopDatetime)
-            if ( finishUserRoute(route, stopDatetime) ) {
+            if (finishUserRoute(route, stopDatetime)) {
                 stopTimerService()
                 synchronizeTrackingActivity(route)
                 sendNotificationToHomeFragment(route)
@@ -249,12 +302,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         trackerRoute.value = createEmptyRoute(0, "", "", 0)
     }
 
-    private fun finishTrackerActivity(route: SqliteRoute, stopDatetime: String) {
+    private fun finishTrackerActivity(
+        route: SqliteRoute,
+        stopDatetime: String
+    ) {
         route.in_progress = 0
         routeRepository.update(route)
     }
 
-    private fun finishUserRoute(route: SqliteRoute, stopDatetime: String): Boolean {
+    private fun finishUserRoute(
+        route: SqliteRoute,
+        stopDatetime: String
+    ): Boolean {
         route.user_route_end_time = stopDatetime
         return routeRepository.update(route) > 0
     }
@@ -279,7 +338,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return null
     }
 
-    fun getCurrentTrackerPath() : ArrayList<GeoPoint> {
+    fun getCurrentTrackerPath(): ArrayList<GeoPoint> {
         var path: ArrayList<GeoPoint> = arrayListOf()
 
         val route = getCurrentRoute()
@@ -305,7 +364,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         route.sync = 1
                         routeRepository.update(route)
                         toastMessage.value =
-                            Response((getApplication() as MainApplication).getString(R.string.tracking_successfully_saved))
+                            Response(
+                                (getApplication() as MainApplication).getString(
+                                    R.string.tracking_successfully_saved
+                                )
+                            )
                     }
 
                     override fun onError(e: Throwable) {
@@ -314,9 +377,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         if (e is HttpException) {
                             if (e.code() == 401) {
                                 toastMessage.value =
-                                    Response((getApplication() as MainApplication).getString(R.string.unauthorized))
+                                    Response(
+                                        (getApplication() as MainApplication).getString(
+                                            R.string.unauthorized
+                                        )
+                                    )
                             } else {
-                                toastMessage.value = Response(false, e.message())
+                                toastMessage.value =
+                                    Response(false, e.message())
                             }
                         } else {
                             toastMessage.value = Response(false, e.toString())
