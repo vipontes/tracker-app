@@ -184,7 +184,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startLocationService() {
         val route = getCurrentRoute()
-        if (route?.in_progress == 0) {
+        if (route == null || route.in_progress == 0) {
             val gpsService = LocationService()
             val gpsIntent = Intent(getApplication(), gpsService::class.java)
             if (!serviceHelper.isMyServiceRunning(gpsService::class.java)) {

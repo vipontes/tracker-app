@@ -11,6 +11,7 @@ import br.net.easify.tracker.model.Route
 import br.net.easify.tracker.repositories.RouteRepository
 import br.net.easify.tracker.repositories.UserRepository
 import br.net.easify.tracker.api.RouteService
+import br.net.easify.tracker.helpers.SharedPreferencesHelper
 import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -36,6 +37,9 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
     @Inject
     lateinit var userRepository: UserRepository
 
+    @Inject
+    lateinit var prefs: SharedPreferencesHelper
+
     init {
         (getApplication() as MainApplication).getAppComponent()?.inject(this)
     }
@@ -58,47 +62,66 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
     }
 
     private fun getRouteFromApi() {
-        routeRepository.delete()
+        prefs.getCurrentRoute().let {
+            if (it.isEmpty()) {
+                routeRepository.delete()
 
-        val userId = userRepository.getLoggedUser()?.user_Id!!
-        disposable.add(
-            routeService.getRoutesByUser(userId)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : DisposableSingleObserver<List<Route>>() {
-                    override fun onSuccess(res: List<Route>) {
+                val userId = userRepository.getLoggedUser()?.user_Id!!
+                disposable.add(
+                    routeService.getRoutesByUser(userId)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(object :
+                            DisposableSingleObserver<List<Route>>() {
+                            override fun onSuccess(res: List<Route>) {
 
-                        var routesFromApi: ArrayList<SqliteRoute> = arrayListOf()
-                        for (item in res) {
-                            val route = SqliteRoute(0, 1).fromRoute(item)
-                            routeRepository.insert(route)
-                            routesFromApi.add(route)
-                        }
+                                var routesFromApi: ArrayList<SqliteRoute> =
+                                    arrayListOf()
+                                for (item in res) {
+                                    val route =
+                                        SqliteRoute(0, 1).fromRoute(item)
+                                    routeRepository.insert(route)
+                                    routesFromApi.add(route)
+                                }
 
-                        routes.value = routesFromApi
-                    }
-
-                    override fun onError(e: Throwable) {
-                        e.printStackTrace()
-
-                        if (e is HttpException) {
-                            if (e.code() == 401) {
-                                toastMessage.value =
-                                    Response(false, (getApplication() as MainApplication).getString(
-                                        R.string.unauthorized))
-                            } else {
-                                toastMessage.value =
-                                    Response(false, (getApplication() as MainApplication).getString(
-                                        R.string.internal_error))
+                                routes.value = routesFromApi
                             }
-                        } else {
-                            toastMessage.value =
-                                Response(false, (getApplication() as MainApplication).getString(
-                                    R.string.internal_error))
-                        }
-                    }
-                })
-        )
+
+                            override fun onError(e: Throwable) {
+                                e.printStackTrace()
+
+                                if (e is HttpException) {
+                                    if (e.code() == 401) {
+                                        toastMessage.value =
+                                            Response(
+                                                false,
+                                                (getApplication() as MainApplication).getString(
+                                                    R.string.unauthorized
+                                                )
+                                            )
+                                    } else {
+                                        toastMessage.value =
+                                            Response(
+                                                false,
+                                                (getApplication() as MainApplication).getString(
+                                                    R.string.internal_error
+                                                )
+                                            )
+                                    }
+                                } else {
+                                    toastMessage.value =
+                                        Response(
+                                            false,
+                                            (getApplication() as MainApplication).getString(
+                                                R.string.internal_error
+                                            )
+                                        )
+                                }
+                            }
+                        })
+                )
+            }
+        }
     }
 
     fun getTotalDistance() {
