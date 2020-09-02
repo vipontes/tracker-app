@@ -1,5 +1,6 @@
 package br.net.easify.tracker.view.adapters
 
+import android.app.Activity
 import android.app.Application
 import android.view.LayoutInflater
 import android.view.View
@@ -8,15 +9,18 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import br.net.easify.tracker.MainApplication
 import br.net.easify.tracker.R
-import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.databinding.HolderRouteBinding
 import br.net.easify.tracker.repositories.RouteRepository
+import br.net.easify.tracker.repositories.database.model.SqliteRoute
+import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 class RouteHistoryAdapter(
     application: Application,
     private var routes: ArrayList<SqliteRoute>,
-    private var listener: OnItemClick
+    private var listener: OnItemClick,
+    private var parentActivity: Activity
 ) : RecyclerView.Adapter<RouteHistoryAdapter.RouteViewHolder>() {
 
     @Inject
@@ -48,6 +52,25 @@ class RouteHistoryAdapter(
             false
         )
         return RouteViewHolder(view)
+    }
+
+    fun removeItem(position: Int) {
+        Snackbar.make(
+            parentActivity.findViewById(R.id.frame_layout),
+            parentActivity.getString(R.string.are_you_sure),
+            2500
+        )
+            .setAction(parentActivity.getString(R.string.delete)) {
+                notifyItemChanged(position) // REMOVER
+            }.addCallback(object : BaseCallback<Snackbar?>() {
+                override fun onDismissed(
+                    transientBottomBar: Snackbar?,
+                    event: Int
+                ) {
+                    super.onDismissed(transientBottomBar, event)
+                    notifyItemChanged(position)
+                }
+            }).show()
     }
 
     override fun onBindViewHolder(holder: RouteViewHolder, position: Int) {
