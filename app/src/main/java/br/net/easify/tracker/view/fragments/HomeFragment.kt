@@ -1,7 +1,15 @@
 package br.net.easify.tracker.view.fragments
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ContentValues
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +36,9 @@ import org.osmdroid.views.overlay.Polyline
 
 class HomeFragment : Fragment() {
 
+    private var imageUri: Uri? = null
+    private val permissionCode: Int = 1000
+    private val imageCaptureCode: Int = 1001
     private lateinit var viewModel: HomeViewModel
     private lateinit var mapController: MapController
     private lateinit var dataBinding: FragmentHomeBinding
@@ -154,8 +165,38 @@ class HomeFragment : Fragment() {
 
     private fun initializeTakePictureButton() {
         dataBinding.takePictureButton.setOnClickListener(View.OnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (requireActivity().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+                    requireActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
 
+                    val permission = arrayOf(
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    )
+
+                    requestPermissions(permission, permissionCode)
+                } else {
+                    openCamera()
+                }
+            } else {
+                openCamera()
+            }
         })
+    }
+
+    private fun openCamera() {
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.TITLE, "New Picture")
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera")
+
+        imageUri = requireActivity()
+            .contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                values)
+
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageCaptureCode)
+        startActivityForResult(cameraIntent, imageCaptureCode)
     }
 
     private fun startTrackerActivity() {
@@ -192,6 +233,33 @@ class HomeFragment : Fragment() {
         dataBinding.mapView.onPause()
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when(requestCode) {
+            permissionCode -> {
+                if ( grantResults.isNotEmpty() &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+                    Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        if (resultCode == Activity.RESULT_OK) {
+            //TODO Work with imageUri
+        }
+    }
+
     private fun addMarker(center: GeoPoint) {
         val marker = Marker(dataBinding.mapView)
         marker.position = center
@@ -212,4 +280,6 @@ class HomeFragment : Fragment() {
         }
         dataBinding.mapView.overlays.add(polyline)
     }
+
+
 }

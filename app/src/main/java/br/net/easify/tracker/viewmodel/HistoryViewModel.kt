@@ -174,7 +174,6 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
 
     override fun onCleared() {
         super.onCleared()
-
         disposable.clear()
     }
 }
