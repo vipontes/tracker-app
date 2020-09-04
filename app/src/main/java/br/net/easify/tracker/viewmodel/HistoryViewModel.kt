@@ -27,9 +27,9 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
     val totalDistance by lazy { MutableLiveData<String>() }
     val routes by lazy { MutableLiveData<List<SqliteRoute>>() }
     val toastMessage by lazy { MutableLiveData<Response>() }
+    val deleteRouteResponse by lazy { MutableLiveData<Response>() }
 
     private var routeService = RouteService(application)
-
 
     @Inject
     lateinit var routeRepository: RouteRepository
@@ -59,6 +59,33 @@ class HistoryViewModel (application: Application) : AndroidViewModel(application
         } else {
             getRouteFromApi()
         }
+    }
+
+    fun deleteRoute(routeId: Long) {
+        disposable.add(
+            routeService.deleteRoute(routeId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object :
+                    DisposableSingleObserver<Response>() {
+                    override fun onSuccess(res: Response) {
+                        routeRepository.delete(routeId)
+                        getAll()
+                        deleteRouteResponse.value = res
+                    }
+
+                    override fun onError(e: Throwable) {
+                        e.printStackTrace()
+                        deleteRouteResponse.value =
+                            Response(
+                                false,
+                                (getApplication() as MainApplication).getString(
+                                    R.string.delete_route_error
+                                )
+                            )
+                    }
+                })
+        )
     }
 
     private fun getRouteFromApi() {

@@ -3,7 +3,6 @@ package br.net.easify.tracker.view.adapters
 import android.app.Activity
 import android.app.Application
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +37,7 @@ class RouteHistoryAdapter(
 
     interface OnItemClick {
         fun onItemClick(route: SqliteRoute)
+        fun onItemDelete(routeId: Long)
     }
 
     override fun onCreateViewHolder(
@@ -61,7 +61,8 @@ class RouteHistoryAdapter(
             2500
         )
             .setAction(parentActivity.getString(R.string.delete)) {
-                notifyItemChanged(position) // REMOVER
+                val route = routes[position]
+                listener.onItemDelete(route.user_route_id!!)
             }.addCallback(object : BaseCallback<Snackbar?>() {
                 override fun onDismissed(
                     transientBottomBar: Snackbar?,
@@ -75,19 +76,11 @@ class RouteHistoryAdapter(
 
     override fun onBindViewHolder(holder: RouteViewHolder, position: Int) {
 
-        var route = routes[position]
+        val route = routes[position]
 
-        if (route.sync == 0 && route.in_progress == 0) {
-            holder.view.refreshButton.visibility = View.VISIBLE
-
-            holder.view.refreshButton.setOnClickListener(View.OnClickListener {
-//                routeRepository.synchronizeTrackingActivity(route)
-            })
-        }
-
-        holder.itemView.setOnClickListener(View.OnClickListener {
+        holder.itemView.setOnClickListener {
             listener.onItemClick(route)
-        })
+        }
 
         holder.view.route = route
     }

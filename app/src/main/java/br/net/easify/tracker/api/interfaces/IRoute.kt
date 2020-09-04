@@ -1,12 +1,10 @@
 package br.net.easify.tracker.api.interfaces
 
+import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.model.Route
 import br.net.easify.tracker.model.RoutePost
 import io.reactivex.Single
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface IRoute {
     @POST("route")
@@ -14,4 +12,7 @@ interface IRoute {
 
     @GET("routes/{userId}")
     fun getRoutesByUser(@Path("userId") userId: Long): Single<List<Route>>
+
+    @DELETE("route/{routeId}")
+    fun deleteRoute(@Path("routeId") routeId: Long): Single<Response>
 }
