@@ -83,8 +83,11 @@ class LoginActivity : AppCompatActivity() {
                 }
             }).check()
 
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        initializeDataBinding()
+        initializeViewModel()
+    }
 
+    private fun initializeDataBinding() {
         dataBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_login)
 
@@ -95,7 +98,10 @@ class LoginActivity : AppCompatActivity() {
                 viewModel.login()
             }
         })
+    }
 
+    private fun initializeViewModel() {
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         viewModel.loginBody.observe(this, loginObserver)
         viewModel.userData.observe(this, userObserver)
         viewModel.tokens.observe(this, tokensObserver)
@@ -104,10 +110,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun startMainActivity() {
         val mainActivity = Intent(this, MainActivity::class.java)
-        mainActivity.flags =
-            Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                    Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(mainActivity)
     }
 }
