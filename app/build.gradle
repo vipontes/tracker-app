@@ -101,6 +101,8 @@ dependencies {
 
     implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.3'
 
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.28.2'
     testImplementation 'org.mockito:mockito-inline:2.28.2'

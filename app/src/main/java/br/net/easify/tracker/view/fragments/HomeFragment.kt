@@ -27,6 +27,8 @@ import br.net.easify.tracker.helpers.CustomAlertDialog
 import br.net.easify.tracker.model.Response
 import br.net.easify.tracker.repositories.database.model.SqliteRoute
 import br.net.easify.tracker.viewmodel.HomeViewModel
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -167,7 +169,8 @@ class HomeFragment : Fragment() {
         dataBinding.takePictureButton.setOnClickListener(View.OnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (requireActivity().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                    requireActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                    requireActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                ) {
 
                     val permission = arrayOf(
                         Manifest.permission.CAMERA,
@@ -176,10 +179,10 @@ class HomeFragment : Fragment() {
 
                     requestPermissions(permission, permissionCode)
                 } else {
-                    openCamera()
+                    openCropper()
                 }
             } else {
-                openCamera()
+                openCropper()
             }
         })
     }
@@ -192,11 +195,20 @@ class HomeFragment : Fragment() {
         imageUri = requireActivity()
             .contentResolver.insert(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                values)
+                values
+            )
 
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageCaptureCode)
         startActivityForResult(cameraIntent, imageCaptureCode)
+    }
+
+    private fun openCropper() {
+        CropImage.activity(imageUri)
+            .setAspectRatio(1, 1)
+            .setFixAspectRatio(true)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .start(requireActivity())
     }
 
     private fun startTrackerActivity() {
@@ -240,11 +252,16 @@ class HomeFragment : Fragment() {
     ) {
         when(requestCode) {
             permissionCode -> {
-                if ( grantResults.isNotEmpty() &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
 
                 } else {
-                    Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Permission denied",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -255,8 +272,18 @@ class HomeFragment : Fragment() {
         resultCode: Int,
         data: Intent?
     ) {
-        if (resultCode == Activity.RESULT_OK) {
-            //TODO Work with imageUri
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == Activity.RESULT_OK) {
+                imageUri = result.uri
+
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+
+            }
+        } else if (requestCode == imageCaptureCode) {
+            if (resultCode == Activity.RESULT_OK) {
+            }
         }
     }
 
