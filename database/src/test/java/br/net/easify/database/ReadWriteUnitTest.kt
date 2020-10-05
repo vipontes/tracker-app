@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import br.net.easify.database.dao.TokenDao
 import br.net.easify.database.dao.UserDao
+import br.net.easify.database.model.SqliteToken
 import br.net.easify.database.model.SqliteUser
 import org.junit.*
 import org.junit.runner.RunWith
@@ -20,6 +22,7 @@ class ReadWriteUnitTest {
 
     private lateinit var database: AppDatabase
     private lateinit var userDao: UserDao
+    private lateinit var tokenDao: TokenDao
 
     @Before
     fun createDb() {
@@ -32,6 +35,7 @@ class ReadWriteUnitTest {
             .build()
 
         userDao = database.userDao()
+        tokenDao = database.tokenDao()
     }
 
     @After
@@ -56,8 +60,13 @@ class ReadWriteUnitTest {
         userDao.insert(user);
     }
 
+    private fun insertToken() {
+        val token: SqliteToken = SqliteToken("1234","5679")
+        tokenDao.insert(token);
+    }
+
     @Test
-    fun testUserInsert() {
+    fun `USER - test User Insert`() {
         insertUser()
         val insertedUser = userDao.getLoggedUser()
         Assert.assertNotNull(insertedUser)
@@ -65,7 +74,7 @@ class ReadWriteUnitTest {
     }
 
     @Test
-    fun testUserDelete() {
+    fun `USER - test User Delete`() {
         insertUser()
         var insertedUser = userDao.getLoggedUser()
         Assert.assertNotNull(insertedUser)
@@ -75,7 +84,7 @@ class ReadWriteUnitTest {
     }
 
     @Test
-    fun testUserUpdate() {
+    fun `USER - test User Update`() {
         insertUser()
         var insertedUser = userDao.getLoggedUser()
         val newUserName = "New User Name"
@@ -85,5 +94,23 @@ class ReadWriteUnitTest {
         userDao.update(insertedUser)
         insertedUser = userDao.getLoggedUser()
         Assert.assertEquals(insertedUser!!.user_name, newUserName)
+    }
+
+    @Test
+    fun `TOKEN - test Token Insert`() {
+        insertToken()
+        val token = tokenDao.get()
+        Assert.assertNotNull(token)
+        tokenDao.delete()
+    }
+
+    @Test
+    fun `TOKEN - test Token Delete`() {
+        insertToken()
+        var token = tokenDao.get()
+        Assert.assertNotNull(token)
+        tokenDao.delete()
+        token = tokenDao.get()
+        Assert.assertNull(token)
     }
 }
