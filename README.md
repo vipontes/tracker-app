@@ -2,7 +2,7 @@
 
 This project is ment to be some kind of running/walking tracker.
 
-![](imgs/tracker.png)
+![](imgs/screenshots.png)
 
 ## Credits
 
