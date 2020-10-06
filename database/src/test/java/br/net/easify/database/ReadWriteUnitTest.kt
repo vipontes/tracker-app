@@ -1,9 +1,9 @@
 package br.net.easify.database
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import br.net.easify.database.dao.TokenDao
 import br.net.easify.database.dao.UserDao
 import br.net.easify.database.model.SqliteToken
@@ -14,7 +14,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk=[28])
+@Config(sdk = [28])
 class ReadWriteUnitTest {
 
     @get:Rule
@@ -27,10 +27,8 @@ class ReadWriteUnitTest {
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-          database = Room.inMemoryDatabaseBuilder(
-            context,
-            AppDatabase::class.java
-        )
+        database = Room
+            .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 
@@ -57,12 +55,12 @@ class ReadWriteUnitTest {
             null
         )
 
-        userDao.insert(user);
+        userDao.insert(user)
     }
 
     private fun insertToken() {
-        val token: SqliteToken = SqliteToken("1234","5679")
-        tokenDao.insert(token);
+        val token: SqliteToken = SqliteToken("1234", "5679")
+        tokenDao.insert(token)
     }
 
     @Test
